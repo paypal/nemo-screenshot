@@ -19,6 +19,14 @@ module.exports = {
 					imagePath = result.autoBaseDir + "/report/";
 					imageObj.imageName = imageName;
 					imageObj.imagePath = imagePath;
+					//Jenkins stuff
+					if (process.env.JENKINS_URL) {
+						var wspace = process.env.WORKSPACE,
+							jurl = process.env.JENKINS_URL,
+							relativeImagePath = imagePath.substr(wspace.length),
+							wsImageUrl = jurl + relativeImagePath + imageName;
+						imageObj.imageUrl = wsImageUrl;
+					}
 					//save screen image
 					fs.writeFile(imagePath + imageName, screenImg, {"encoding": "base64"}, function (err) {
 						if (err) {
