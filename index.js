@@ -2,12 +2,34 @@
 var fs = require('fs');
 
 module.exports = {
-
+	/**
+	*	setup - initialize this functionality during nemo.setup
+	*	@param config {Object} - full config object passed to nemo.setup(). 
+	*								This plugin's config must be referenced with the same identifier 
+	*								used in the setup method below
+	*	@param result {Object} - result object which will eventually be passed back to the test script 
+	*								once all setup methods are complete. Namespace this plugin's 
+	*								functionality under it's identifier.
+	*	@param callback {Function} - callback to continue the setup process. 
+	*								Args are err {Error}, config {Object}, returnObj {Object}
+	*/
 	"setup": function (config, result, callback) {
 
 		var returnObj = result,
 			driver = result.driver;
 		returnObj.screenshot = {
+			/**
+			*	snap - save a screenshot image as PNG to the "report" directory
+			*	@param filename {String} - should be unique within the report directory and indicate which
+			*								test it is associated with
+			*	@returns {Promise} - upon successful completion, Promise will resolve to a JSON object as below.
+			*							If Jenkins environment variables are found, imageUrl will be added
+			*							{
+			*								"imageName": "myImage.png", 
+			*								"/path/to/image/": "val" 
+			*								[, "imageUrl": "jenkinsURL"]
+			*							}
+			*/
 			"snap": function (filename) {
 				var deferred = result.wd.promise.defer(),
 					iterationLabel = (result.iterationLabel) ? "-" + result.iterationLabel : "",
@@ -40,6 +62,14 @@ module.exports = {
 				});
 				return deferred;
 			},
+			/**
+			*	doneError - wraps "snap" and provides easy way to get a screenshot in the "rejected" callback 
+			*					of a selenium-webdriver promise chain
+			*	@param filename {String} - should be unique within the report directory and indicate which
+			*								test it is associated with
+			*	@param err {Error} - Error object thrown in the Promise chain. stack will be modified with image information
+			*	@param done {Function} - mocha "done" function to call and end current test execution
+			*/
 			"doneError": function (filename, err, done) {
 				this.snap(filename).
 					then(function (imageObject) {
