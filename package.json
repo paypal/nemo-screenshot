@@ -1,0 +1,29 @@
+{
+  "name": "nemo-screenshot",
+  "version": "0.0.0",
+  "description": "Nemo Plugin to Use selenium-webdriver to take a screenshot",
+  "main": "index.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "devDependencies": {
+    "mocha": "~1.10.0",
+    "chai": "~1.6.0",
+    "grunt": "~0.4.1",
+    "grunt-simple-mocha": "~0.4.0",
+    "grunt-contrib-jshint": "~0.7.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.paypal.com:NodeTestTools/nemo-screenshot.git"
+  },
+  "keywords": [
+    "Nemo",
+    "plugin",
+    "screenshot",
+    "selenium",
+    "selenium-webdriver"
+  ],
+  "author": "Matt Edelman",
+  "license": "ISC"
+}
