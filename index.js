@@ -23,8 +23,9 @@ module.exports = {
 					if (process.env.JENKINS_URL) {
 						var wspace = process.env.WORKSPACE,
 							jurl = process.env.JENKINS_URL,
+							jname = process.env.JOB_NAME,
 							relativeImagePath = imagePath.substr(wspace.length),
-							wsImageUrl = jurl + relativeImagePath + imageName;
+							wsImageUrl = jurl + "job/" + jname + "/ws" + relativeImagePath + imageName;
 						imageObj.imageUrl = wsImageUrl;
 					}
 					//save screen image
@@ -42,7 +43,8 @@ module.exports = {
 			"doneError": function (filename, err, done) {
 				this.snap(filename).
 					then(function (imageObject) {
-						err.stack = err.stack + "\nnemo-screenshot::" + JSON.stringify(imageObject) + "::nemo-screenshot";
+						var output = (imageObject.imageUrl) ? "\nnemo-screenshot\n" + imageObject.imageUrl + "\n" : "\nnemo-screenshot::" + JSON.stringify(imageObject) + "::nemo-screenshot";
+						err.stack = err.stack + output;
 						done(err);
 					});
 			}
