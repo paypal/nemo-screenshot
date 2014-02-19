@@ -77,6 +77,21 @@ module.exports = {
 						err.stack = err.stack + output;
 						done(err);
 					});
+			},
+			/**
+			*	done - wraps "snap" and provides easy way to get a screenshot in the "resolved" callback 
+			*					of a selenium-webdriver promise chain
+			*	@param filename {String} - should be unique within the report directory and indicate which
+			*								test it is associated with
+			*	@param done {Function} - mocha "done" function to call and end current test execution
+			*/
+			"done": function (filename, done) {
+				this.snap(filename).
+					then(function (imageObject) {
+						var output = (imageObject.imageUrl) ? "\nnemo-screenshot\n" + imageObject.imageUrl + "\n" : "\nnemo-screenshot::" + JSON.stringify(imageObject) + "::nemo-screenshot";
+						console.log(output);
+						done();
+					});
 			}
 		};
 		callback(null, config, returnObj);
