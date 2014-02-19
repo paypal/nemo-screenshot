@@ -40,7 +40,7 @@ module.exports = {
 					imageName = filename + iterationLabel + ".png";
 					imagePath = result.autoBaseDir + "/report/";
 					imageObj.imageName = imageName;
-					imageObj.imagePath = imagePath;
+					imageObj.imagePath = imagePath + imageName;
 					//Jenkins stuff
 					if (process.env.JENKINS_URL) {
 						var wspace = process.env.WORKSPACE,
