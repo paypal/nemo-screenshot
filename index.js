@@ -76,6 +76,9 @@ module.exports = {
 						var output = (imageObject.imageUrl) ? "\nnemo-screenshot\n" + imageObject.imageUrl + "\n" : "\nnemo-screenshot::" + JSON.stringify(imageObject) + "::nemo-screenshot";
 						err.stack = err.stack + output;
 						done(err);
+					}, function(scerror) {
+						console.log("nemo-screenshot encountered some error.", scerror.toString());
+						done(err);
 					});
 			},
 			/**
@@ -91,6 +94,9 @@ module.exports = {
 						var output = (imageObject.imageUrl) ? "\nnemo-screenshot\n" + imageObject.imageUrl + "\n" : "\nnemo-screenshot::" + JSON.stringify(imageObject) + "::nemo-screenshot";
 						console.log(output);
 						done();
+					},function(scerr) {
+						console.log("nemo-screenshot encountered some error.", scerr.toString());
+						done(err);
 					});
 			}
 		};
