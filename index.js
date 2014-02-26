@@ -98,7 +98,7 @@ module.exports = {
 						done();
 					},function(scerr) {
 						console.log("nemo-screenshot encountered some error.", scerr.toString());
-						done(err);
+						done();
 					});
 			}
 		};

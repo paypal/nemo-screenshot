@@ -1,5 +1,9 @@
 ## Changelog
 
+### v0.1.7
+
+* earlier fix wasn't enough AGAIN. ugh i need a test suite for this module
+
 ### v0.1.6
 
 * earlier fix wasn't enough
