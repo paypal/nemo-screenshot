@@ -59,6 +59,8 @@ module.exports = {
 						}
 
 					});
+				}, function(err) {
+					deferred.reject(err);
 				});
 				return deferred;
 			},
