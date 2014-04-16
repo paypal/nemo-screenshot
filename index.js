@@ -32,13 +32,13 @@ module.exports = {
 			*/
 			"snap": function (filename) {
 				var deferred = result.wd.promise.defer(),
-					iterationLabel = (result.iterationLabel) ? "-" + result.iterationLabel : "",
+					iterationLabel = (result.props.iterationLabel) ? "-" + result.props.iterationLabel : "",
 					imagePath,
 					imageName,
 					imageObj = {"imageName": null, "imagePath": null};
 				driver.takeScreenshot().then(function (screenImg) {
 					imageName = filename + iterationLabel + ".png";
-					imagePath = result.autoBaseDir + "/report/";
+					imagePath = result.props.autoBaseDir + "/report/";
 					imageObj.imageName = imageName;
 					imageObj.imagePath = imagePath + imageName;
 					//Jenkins stuff
