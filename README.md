@@ -13,7 +13,7 @@ Nemo plugin which uses selenium-webdriver to take a screenshot
 
 
 ```javascript
-"nemo-screenshot": "0.1.2",
+"nemo-screenshot": "^0.1.0",
 ```
 
 3. Replace error "done" function body as follows
