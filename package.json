@@ -1,6 +1,6 @@
 {
   "name": "nemo-screenshot",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Nemo Plugin to Use selenium-webdriver to take a screenshot",
   "main": "index.js",
   "registerAs": "screenshot",
