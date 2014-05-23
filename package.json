@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Nemo Plugin to Use selenium-webdriver to take a screenshot",
   "main": "index.js",
+  "registerAs": "screenshot",
   "scripts": {
     "test": "grunt test"
   },
