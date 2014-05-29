@@ -48,6 +48,18 @@ it('should locate bank elements @locateBankElements@', function (done) {
 */
 ```
 
+#### screenshot.done
+
+```javascript
+/**
+*	done - wraps "snap" and provides easy way to get a screenshot in the "resolved" callback 
+*					of a selenium-webdriver promise chain
+*	@param filename {String} - should be unique within the report directory and indicate which
+*								test it is associated with
+*	@param done {Function} - mocha "done" function to call and end current test execution
+*/
+```
+
 #### screenshot.doneError
 
 ```javascript
