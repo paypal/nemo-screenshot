@@ -41,12 +41,19 @@ it('should locate bank elements @locateBankElements@', function (done) {
 *	@param filename {String} - should be unique within the report directory and indicate which
 *								test it is associated with
 *	@returns {Promise} - upon successful completion, Promise will resolve to a JSON object as below.
-*							If Jenkins environment variables are found, imageUrl will be added
-*							{
-*								"imageName": "myImage.png", 
-*								"/path/to/image/": "val" 
-*								[, "imageUrl": "jenkinsURL"]
-*							}
+*							
+*/
+```
+
+#### screenshot.done
+
+```javascript
+/**
+*	done - wraps "snap" and provides easy way to get a screenshot in the "resolved" callback 
+*					of a selenium-webdriver promise chain
+*	@param filename {String} - should be unique within the report directory and indicate which
+*								test it is associated with
+*	@param done {Function} - mocha "done" function to call and end current test execution
 */
 ```
 
