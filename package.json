@@ -5,7 +5,7 @@
   "registerAs": "screenshot",
   "main": "index.js",
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt"
   },
   "devDependencies": {
     "mocha": "~1.10.0",

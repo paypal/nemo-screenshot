@@ -2,6 +2,8 @@
 
 Nemo plugin which uses selenium-webdriver to take a screenshot
 
+[![Build Status](https://travis-ci.org/paypal/nemo-screenshot.svg?branch=master)](https://travis-ci.org/paypal/nemo-screenshot)
+
 ### Requirements
 
 * Assumes use of grunt-loop-mocha v0.2.6 or higher
