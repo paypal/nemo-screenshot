@@ -2,6 +2,8 @@
 
 Nemo plugin which uses selenium-webdriver to take a screenshot
 
+Register as "screenshot" (see below)
+
 [![Build Status](https://travis-ci.org/paypal/nemo-screenshot.svg?branch=master)](https://travis-ci.org/paypal/nemo-screenshot)
 
 ### Requirements
@@ -10,26 +12,37 @@ Nemo plugin which uses selenium-webdriver to take a screenshot
 
 ### Usage
 
-1. Add this to your package.json
-2. Add this to your nemo-plugins.json
-
+* Add this to your package.json
+* Add this to your nemo-plugins.json
+```javascript
+{
+	"plugins": {
+		"screenshot": {
+			"module": "nemo-screenshot",
+			"register": true
+		}
+	}
+}
+```
 
 ```javascript
 "nemo-screenshot": "^0.1.0",
 ```
 
-3. Replace error "done" function body as follows
+* Replace error "done" function body as follows
 
 ```javascript
 it('should locate bank elements @locateBankElements@', function (done) {
-	view.wallet.getBankElements().
+	nemo.view.wallet.getBankElements().
 		then(function () {
 			done()
 		}, function (err) {
-			setup.screenshot.doneError("locateBankElement", err, done);
+			nemo.screenshot.doneError("locateBankElement", err, done);
 		});
 });
 ```
+
+Usage of other screenshot methods is similar
 
 ### API
 
