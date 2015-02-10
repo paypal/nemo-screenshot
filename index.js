@@ -14,6 +14,20 @@
 \*───────────────────────────────────────────────────────────────────────────*/
 'use strict';
 var fs = require('fs');
+var path = require('path');
+fs.mkdirRecursive = function(dirPath, mode) {
+	try {
+		fs.mkdirSync(dirPath, mode);
+	}
+	catch (error) {
+		if (error.code == 'EEXIST' || error.errno == 34) {
+			fs.mkdirRecursive(path.dirname(dirPath), mode);
+			fs.mkdirRecursive(dirPath, mode);
+		}
+		else
+			throw error;
+	}
+};
 
 module.exports = {
 	/**
@@ -53,6 +67,16 @@ module.exports = {
 				driver.takeScreenshot().then(function (screenImg) {
 					imageName = filename + iterationLabel + ".png";
 					imagePath = result.props.autoBaseDir + "/report/";
+
+					if (process.env.SCREENSHOT_URL) {
+						imagePath = path.normalize(result.props.autoBaseDir + "/" + process.env.SCREENSHOT_URL + '/');
+					}
+
+					var imageDir = path.dirname(path.normalize(imagePath + imageName));
+					if (!fs.existsSync(imageDir)) {
+						fs.mkdirRecursive(imageDir);
+					}
+
 					imageObj.imageName = imageName;
 					imageObj.imagePath = imagePath + imageName;
 					//Jenkins stuff
