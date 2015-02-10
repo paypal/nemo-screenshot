@@ -20,12 +20,13 @@ fs.mkdirRecursive = function(dirPath, mode) {
 		fs.mkdirSync(dirPath, mode);
 	}
 	catch (error) {
-		if (error.code == 'EEXIST' || error.errno == 34) {
+		if (error.code === 'EEXIST' || error.errno === 34) {
 			fs.mkdirRecursive(path.dirname(dirPath), mode);
 			fs.mkdirRecursive(dirPath, mode);
 		}
-		else
-			throw error;
+		else {
+            throw error;
+        }
 	}
 };
 
