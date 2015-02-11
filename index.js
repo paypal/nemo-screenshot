@@ -25,9 +25,11 @@ fs.mkdirRecursive = function(dirPath, mode) {
 			fs.mkdirRecursive(dirPath, mode);
 		}
 		else {
-            throw error;
-        }
+			console.log(error);
+			return error
+		}
 	}
+	return false;
 };
 
 module.exports = {
@@ -75,7 +77,10 @@ module.exports = {
 
 					var imageDir = path.dirname(path.normalize(imagePath + imageName));
 					if (!fs.existsSync(imageDir)) {
-						fs.mkdirRecursive(imageDir);
+						var error = fs.mkdirRecursive(imageDir);
+						if (error) {
+							deferred.reject(error);
+						}
 					}
 
 					imageObj.imageName = imageName;
