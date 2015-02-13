@@ -26,7 +26,7 @@ fs.mkdirRecursive = function(dirPath, mode) {
 		}
 		else {
 			console.log(error);
-			return error
+			return error;
 		}
 	}
 	return false;
