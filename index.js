@@ -14,6 +14,23 @@
 \*───────────────────────────────────────────────────────────────────────────*/
 'use strict';
 var fs = require('fs');
+var path = require('path');
+fs.mkdirRecursive = function(dirPath, mode) {
+	try {
+		fs.mkdirSync(dirPath, mode);
+	}
+	catch (error) {
+		if (error.code === 'EEXIST' || error.errno === 34) {
+			fs.mkdirRecursive(path.dirname(dirPath), mode);
+			fs.mkdirRecursive(dirPath, mode);
+		}
+		else {
+			console.log(error);
+			return error;
+		}
+	}
+	return false;
+};
 
 module.exports = {
 	/**
@@ -28,6 +45,11 @@ module.exports = {
 	*								Args are err {Error}, config {Object}, returnObj {Object}
 	*/
 	"setup": function (config, result, callback) {
+
+		var screenShotPath = '';
+		if (config.hasOwnProperty('screenshot') && config.screenshot.hasOwnProperty('screenShotPath')) {
+			screenShotPath = config.screenshot.screenShotPath;
+		}
 
 		var returnObj = result,
 			driver = result.driver;
@@ -53,6 +75,19 @@ module.exports = {
 				driver.takeScreenshot().then(function (screenImg) {
 					imageName = filename + iterationLabel + ".png";
 					imagePath = result.props.autoBaseDir + "/report/";
+
+					if (screenShotPath) {
+						imagePath = path.normalize(result.props.autoBaseDir + "/" + screenShotPath + '/');
+					}
+
+					var imageDir = path.dirname(path.normalize(imagePath + imageName));
+					if (!fs.existsSync(imageDir)) {
+						var error = fs.mkdirRecursive(imageDir);
+						if (error) {
+							deferred.reject(error);
+						}
+					}
+
 					imageObj.imageName = imageName;
 					imageObj.imagePath = imagePath + imageName;
 					//Jenkins stuff
