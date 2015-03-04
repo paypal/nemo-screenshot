@@ -46,6 +46,11 @@ module.exports = {
 	*/
 	"setup": function (config, result, callback) {
 
+		var screenShotPath = '';
+		if (config.hasOwnProperty('screenshot') && config.screenshot.hasOwnProperty('screenShotPath')) {
+			screenShotPath = config.screenshot.screenShotPath;
+		}
+
 		var returnObj = result,
 			driver = result.driver;
 		returnObj.screenshot = {
@@ -71,8 +76,8 @@ module.exports = {
 					imageName = filename + iterationLabel + ".png";
 					imagePath = result.props.autoBaseDir + "/report/";
 
-					if (process.env.SCREENSHOT_URL) {
-						imagePath = path.normalize(result.props.autoBaseDir + "/" + process.env.SCREENSHOT_URL + '/');
+					if (screenShotPath) {
+						imagePath = path.normalize(result.props.autoBaseDir + "/" + screenShotPath + '/');
 					}
 
 					var imageDir = path.dirname(path.normalize(imagePath + imageName));
