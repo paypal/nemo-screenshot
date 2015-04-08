@@ -15,14 +15,14 @@
 'use strict';
 var fs = require('fs');
 var path = require('path');
-fs.mkdirRecursive = function(dirPath, mode) {
+var mkdirRecursive = function(dirPath, mode) {
 	try {
 		fs.mkdirSync(dirPath, mode);
 	}
 	catch (error) {
 		if (error.code === 'EEXIST' || error.errno === 34) {
-			fs.mkdirRecursive(path.dirname(dirPath), mode);
-			fs.mkdirRecursive(dirPath, mode);
+			mkdirRecursive(path.dirname(dirPath), mode);
+			mkdirRecursive(dirPath, mode);
 		}
 		else {
 			console.log(error);
@@ -35,25 +35,16 @@ fs.mkdirRecursive = function(dirPath, mode) {
 module.exports = {
 	/**
 	*	setup - initialize this functionality during nemo.setup
-	*	@param config {Object} - full config object passed to nemo.setup(). 
-	*								This plugin's config must be referenced with the same identifier 
-	*								used in the setup method below
-	*	@param result {Object} - result object which will eventually be passed back to the test script 
-	*								once all setup methods are complete. Namespace this plugin's 
-	*								functionality under it's identifier.
-	*	@param callback {Function} - callback to continue the setup process. 
-	*								Args are err {Error}, config {Object}, returnObj {Object}
+	*	@param screenShotPath {Object} - fs path where screenshots should be saved
+	*	@param nemo {Object} - nemo namespace
+	*	@param callback {Function} - errback function
 	*/
-	"setup": function (config, result, callback) {
+	"setup": function (screenShotPath, nemo, callback) {
 
-		var screenShotPath = '';
-		if (config.hasOwnProperty('screenshot') && config.screenshot.hasOwnProperty('screenShotPath')) {
-			screenShotPath = config.screenshot.screenShotPath;
-		}
 
-		var returnObj = result,
-			driver = result.driver;
-		returnObj.screenshot = {
+
+		var driver = nemo.driver;
+		nemo.screenshot = {
 			/**
 			*	snap - save a screenshot image as PNG to the "report" directory
 			*	@param filename {String} - should be unique within the report directory and indicate which
@@ -67,40 +58,34 @@ module.exports = {
 			*							}
 			*/
 			"snap": function (filename) {
-				var deferred = result.wd.promise.defer(),
-					iterationLabel = (result.props.iterationLabel) ? "-" + result.props.iterationLabel : "",
-					imagePath,
+				var deferred = nemo.wd.promise.defer(),
 					imageName,
 					imageObj = {"imageName": null, "imagePath": null};
 				driver.takeScreenshot().then(function (screenImg) {
-					imageName = filename + iterationLabel + ".png";
-					imagePath = result.props.autoBaseDir + "/report/";
+					imageName = filename + ".png";
 
-					if (screenShotPath) {
-						imagePath = path.normalize(result.props.autoBaseDir + "/" + screenShotPath + '/');
-					}
 
-					var imageDir = path.dirname(path.normalize(imagePath + imageName));
+					var imageDir = path.dirname(path.resolve(screenShotPath, imageName));
 					if (!fs.existsSync(imageDir)) {
-						var error = fs.mkdirRecursive(imageDir);
+						var error = mkdirRecursive(imageDir);
 						if (error) {
 							deferred.reject(error);
 						}
 					}
 
 					imageObj.imageName = imageName;
-					imageObj.imagePath = imagePath + imageName;
+					imageObj.imagePath = screenShotPath + imageName;
 					//Jenkins stuff
 					if (process.env.JENKINS_URL) {
 						var wspace = process.env.WORKSPACE,
 							jurl = process.env.JENKINS_URL,
 							jname = process.env.JOB_NAME,
-							relativeImagePath = imagePath.substr(wspace.length),
+							relativeImagePath = screenShotPath.substr(wspace.length),
 							wsImageUrl = jurl + "job/" + jname + "/ws" + relativeImagePath + imageName;
 						imageObj.imageUrl = wsImageUrl;
 					}
 					//save screen image
-					fs.writeFile(imagePath + imageName, screenImg, {"encoding": "base64"}, function (err) {
+					fs.writeFile(path.resolve(screenShotPath, imageName), screenImg, {"encoding": "base64"}, function (err) {
 						if (err) {
 							deferred.reject(err);
 						} else {
@@ -151,7 +136,7 @@ module.exports = {
 					});
 			}
 		};
-		callback(null, config, returnObj);
+		callback(null);
 
 	}
 };
