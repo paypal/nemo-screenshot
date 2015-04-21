@@ -17,7 +17,7 @@ Register as "screenshot" (see below)
 ```javascript
 plugins: {
   screenshot: {
-    module: 'path:../index',
+    module: 'nemo-screenshot',
     arguments: ['path:report']
   },
   /* other plugins */
