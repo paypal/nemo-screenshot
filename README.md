@@ -8,77 +8,58 @@ Register as "screenshot" (see below)
 
 ### Requirements
 
-* Assumes use of grunt-loop-mocha v0.2.6 or higher
+* Lists `nemo@^1.0.4` as a peerDependency
 
 ### Usage
 
-* Add this to your package.json
-* Add this to your nemo-plugins.json
+* `npm install --save-dev nemo-screenshot@^v1.0.0`
+* Add this to your Nemo plugins configuration (adjust `arguments` according to where you want screenshots to be saved):
 ```javascript
-{
-	"plugins": {
-		"screenshot": {
-			"module": "nemo-screenshot",
-			"register": true
-		}
-	}
+plugins: {
+  screenshot: {
+    module: 'nemo-screenshot',
+    arguments: ['path:report']
+  },
+  /* other plugins */
+},
+driver: {
+  //driver props
 }
 ```
-
-```javascript
-"nemo-screenshot": "^0.1.0",
-```
-
-* Replace error "done" function body as follows
-
-```javascript
-it('should locate bank elements @locateBankElements@', function (done) {
-	nemo.view.wallet.getBankElements().
-		then(function () {
-			done()
-		}, function (err) {
-			nemo.screenshot.doneError("locateBankElement", err, done);
-		});
-});
-```
-
-Usage of other screenshot methods is similar
 
 ### API
 
 #### screenshot.snap
 
+* `@argument filename {String}` will save `<report directory>/filename.png` to the filesystem
+* `@returns {Promise}` resolves to a JSON object:
+
 ```javascript
-/**
-*	snap - save a screenshot image as PNG to the "report" directory
-*	@param filename {String} - should be unique within the report directory and indicate which
-*								test it is associated with
-*	@returns {Promise} - upon successful completion, Promise will resolve to a JSON object as below.
-*							
-*/
+{
+  "imageName": "myImage.png",
+  "imagePath": "/path/to/image/"
+  [, "imageUrl": "jenkinsURL"] //this will be included optionally if Jenkins environment variables are present
+}
 ```
 
 #### screenshot.done
 
-```javascript
-/**
-*	done - wraps "snap" and provides easy way to get a screenshot in the "resolved" callback 
-*					of a selenium-webdriver promise chain
-*	@param filename {String} - should be unique within the report directory and indicate which
-*								test it is associated with
-*	@param done {Function} - mocha "done" function to call and end current test execution
-*/
-```
+This is a convenience wrapper around `screenshot.snap` which can accept a callback, e.g. a mocha `done` method
 
-#### screenshot.doneError
+* `@argument filename {String}` will save `<report directory>/filename.png` to the filesystem
+* `@argument done {Function}` errback function to execute after screenshot is saved (or if there is an error saving screenshot)
+* `@argument err {Error} (optional)` error associated with screenshot. image information will be attached to this error's stack trace for reporting purposes
+
+Usage example:
 
 ```javascript
-/**
-*	doneError - wraps "snap" and provides easy way to get a screenshot in the "rejected" callback 
-*					of a selenium-webdriver promise chain
-*	@param filename {String} - should be unique within the report directory and indicate which
-*								test it is associated with
-*	@param err {Error} - Error object thrown in the Promise chain. stack will be modified with image information
-*	@param done {Function} - mocha "done" function to call and end current test execution
-*/
+  it('will do some stuff then take a screenshot', function (done) {
+    nemo.somePlugin.someAction().then(function() {
+      //success!
+      nemo.screenshot.done('success', done);
+    }, function (err) {
+      //failure!
+      nemo.screenshot.done('success', done, err);
+    });
+  });
 ```
