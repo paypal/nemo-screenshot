@@ -15,6 +15,9 @@
     "mocha": "~1.10.0",
     "nemo": "^1.0.4"
   },
+  "peerDependencies": {
+    "nemo": "^1.0.4"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/paypal/nemo-screenshot.git"

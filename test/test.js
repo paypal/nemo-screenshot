@@ -64,17 +64,17 @@ describe('nemo-screenshot', function () {
     });
 
   });
-  it('will use @done@ to take a screenshot', function(done) {
-     nemo.screenshot.done('goog', function fakeDone() {
-       assert(fs.statSync(path.resolve(__dirname, 'report/goog.png')));
-       done();
-     })();
+  it('will use @done@ to take a screenshot', function (done) {
+    nemo.screenshot.done('goog', function fakeDone() {
+      assert(fs.statSync(path.resolve(__dirname, 'report/goog.png')));
+      done();
+    });
   });
-  it('will use @doneError@ to take a screenshot', function(done) {
-    nemo.screenshot.doneError('goog', function fakeDone(err) {
+  it('will use @done@error@ to take a screenshot in an error scenario', function(done) {
+    nemo.screenshot.done('goog', function fakeDone(err) {
       assert(err.stack.indexOf('nemo-screenshot') !== -1);
       assert(fs.statSync(path.resolve(__dirname, 'report/goog.png')));
       done();
-    })(new Error('my error'));
+    }, new Error('my error'));
   });
 });

@@ -52,7 +52,7 @@ module.exports = {
        *              If Jenkins environment variables are found, imageUrl will be added
        *              {
 			*								"imageName": "myImage.png", 
-			*								"/path/to/image/": "val" 
+			*								"imagePath": "/path/to/image/"
 			*								[, "imageUrl": "jenkinsURL"]
 			*							}
        */
@@ -97,50 +97,19 @@ module.exports = {
         });
         return deferred;
       },
-      /**
-       *  doneError - wraps "snap" and provides easy way to get a screenshot in the "rejected" callback
-       *          of a selenium-webdriver promise chain
-       *  @param filename {String} - should be unique within the report directory and indicate which
-       *                test it is associated with
-       *  @param err {Error} - Error object thrown in the Promise chain. stack will be modified with image information
-       *  @param done {Function} - mocha "done" function to call and end current test execution
-       */
-      "doneError": function (filename, done) {
-        var self = this;
-        return function (err) {
-          self.snap(filename).
-            then(function (imageObject) {
-              var output = (imageObject.imageUrl) ? "\nnemo-screenshot\n" + imageObject.imageUrl + "\n" : "\nnemo-screenshot::" + JSON.stringify(imageObject) + "::nemo-screenshot";
+
+      "done": function (filename, done, err) {
+        this.snap(filename).
+          then(function (imageObject) {
+            var output = (imageObject.imageUrl) ? "\nnemo-screenshot\n" + imageObject.imageUrl + "\n" : "\nnemo-screenshot::" + JSON.stringify(imageObject) + "::nemo-screenshot";
+            if (err) {
               err.stack = err.stack + output;
-              done(err);
-            }, function (scerror) {
-              console.log("nemo-screenshot encountered some error.", scerror.toString());
-              done(err);
-            });
-        };
-
-      },
-      /**
-       *  done - wraps "snap" and provides easy way to get a screenshot in the "resolved" callback
-       *          of a selenium-webdriver promise chain
-       *  @param filename {String} - should be unique within the report directory and indicate which
-       *                test it is associated with
-       *  @param done {Function} - mocha "done" function to call and end current test execution
-       */
-      "done": function (filename, done) {
-        var self = this;
-        return function () {
-          self.snap(filename).
-            then(function (imageObject) {
-              var output = (imageObject.imageUrl) ? "\nnemo-screenshot\n" + imageObject.imageUrl + "\n" : "\nnemo-screenshot::" + JSON.stringify(imageObject) + "::nemo-screenshot";
-              console.log(output);
-              done();
-            }, function (scerr) {
-              console.log("nemo-screenshot encountered some error.", scerr.toString());
-              done();
-            });
-        };
-
+            }
+            done(err);
+          }, function (scerror) {
+            console.log("nemo-screenshot encountered some error.", scerror.toString());
+            done(scerror);
+          });
       }
     };
     callback(null);
