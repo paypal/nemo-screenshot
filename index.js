@@ -15,21 +15,12 @@
 'use strict';
 var fs = require('fs');
 var path = require('path');
-var mkdirRecursive = function (dirPath, mode) {
-  try {
-    fs.mkdirSync(dirPath, mode);
-  }
-  catch (error) {
-    if (error.code === 'EEXIST' || error.errno === 34) {
-      mkdirRecursive(path.dirname(dirPath), mode);
-      mkdirRecursive(dirPath, mode);
-    }
-    else {
-      console.log(error);
-      return error;
-    }
-  }
-  return false;
+var mkdirRecursive = function(dirPath, mode) {
+		if (!fs.existsSync(dirPath)) {
+			mkdirRecursive(path.dirname(dirPath), mode);
+			fs.mkdirSync(dirPath, mode);
+		}
+	return false;
 };
 
 module.exports = {
@@ -58,18 +49,16 @@ module.exports = {
        */
       "snap": function (filename) {
         var deferred = nemo.wd.promise.defer(),
+		  iterationLabel = (result.props.iterationLabel) ? "-" + result.props.iterationLabel : "",
           imageName,
           imageObj = {"imageName": null, "imagePath": null};
         driver.takeScreenshot().then(function (screenImg) {
-          imageName = filename + ".png";
+          imageName = filename + iterationLabel + ".png";
 
 
           var imageDir = path.dirname(path.resolve(screenShotPath, imageName));
           if (!fs.existsSync(imageDir)) {
-            var error = mkdirRecursive(imageDir);
-            if (error) {
-              deferred.reject(error);
-            }
+            mkdirRecursive(imageDir);
           }
 
           imageObj.imageName = imageName;
