@@ -16,11 +16,11 @@
 var fs = require('fs');
 var path = require('path');
 var mkdirRecursive = function(dirPath, mode) {
-		if (!fs.existsSync(dirPath)) {
-			mkdirRecursive(path.dirname(dirPath), mode);
-			fs.mkdirSync(dirPath, mode);
-		}
-	return false;
+        if (!fs.existsSync(dirPath)) {
+            mkdirRecursive(path.dirname(dirPath), mode);
+            fs.mkdirSync(dirPath, mode);
+        }
+    return false;
 };
 
 module.exports = {
@@ -42,14 +42,14 @@ module.exports = {
        *  @returns {Promise} - upon successful completion, Promise will resolve to a JSON object as below.
        *              If Jenkins environment variables are found, imageUrl will be added
        *              {
-			*								"imageName": "myImage.png", 
-			*								"imagePath": "/path/to/image/"
-			*								[, "imageUrl": "jenkinsURL"]
-			*							}
+            *                                "imageName": "myImage.png", 
+            *                                "imagePath": "/path/to/image/"
+            *                                [, "imageUrl": "jenkinsURL"]
+            *                            }
        */
       "snap": function (filename) {
         var deferred = nemo.wd.promise.defer(),
-		  iterationLabel = (result.props.iterationLabel) ? "-" + result.props.iterationLabel : "",
+          iterationLabel = (nemo.props.iterationLabel) ? "-" + nemo.props.iterationLabel : "",
           imageName,
           imageObj = {"imageName": null, "imagePath": null};
         driver.takeScreenshot().then(function (screenImg) {
