@@ -15,19 +15,10 @@
 'use strict';
 var fs = require('fs');
 var path = require('path');
-fs.mkdirRecursive = function(dirPath, mode) {
-	try {
+var mkdirRecursive = function(dirPath, mode) {
+	if (!fs.existsSync(dirPath)) {
+		mkdirRecursive(path.dirname(dirPath), mode);
 		fs.mkdirSync(dirPath, mode);
-	}
-	catch (error) {
-		if (error.code === 'EEXIST' || error.errno === 34) {
-			fs.mkdirRecursive(path.dirname(dirPath), mode);
-			fs.mkdirRecursive(dirPath, mode);
-		}
-		else {
-			console.log(error);
-			return error;
-		}
 	}
 	return false;
 };
@@ -82,10 +73,7 @@ module.exports = {
 
 					var imageDir = path.dirname(path.normalize(imagePath + imageName));
 					if (!fs.existsSync(imageDir)) {
-						var error = fs.mkdirRecursive(imageDir);
-						if (error) {
-							deferred.reject(error);
-						}
+						mkdirRecursive(imageDir);
 					}
 
 					imageObj.imageName = imageName;
