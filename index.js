@@ -15,19 +15,12 @@
 'use strict';
 var fs = require('fs');
 var path = require('path');
-var mkdirRecursive = function (dirPath, mode) {
-  try {
+var mkdirRecursive = function(dirPath, mode)
+{
+  if (!fs.existsSync(dirPath))
+  {
+    mkdirRecursive(path.dirname(dirPath), mode);
     fs.mkdirSync(dirPath, mode);
-  }
-  catch (error) {
-    if (error.code === 'EEXIST' || error.errno === 34) {
-      mkdirRecursive(path.dirname(dirPath), mode);
-      mkdirRecursive(dirPath, mode);
-    }
-    else {
-      console.log(error);
-      return error;
-    }
   }
   return false;
 };
@@ -51,10 +44,10 @@ module.exports = {
        *  @returns {Promise} - upon successful completion, Promise will resolve to a JSON object as below.
        *              If Jenkins environment variables are found, imageUrl will be added
        *              {
-			*								"imageName": "myImage.png", 
-			*								"imagePath": "/path/to/image/"
-			*								[, "imageUrl": "jenkinsURL"]
-			*							}
+       *                  "imageName": "myImage.png",
+       *                  "imagePath": "/path/to/image/"
+       *                  [, "imageUrl": "jenkinsURL"]
+       *              }
        */
       "snap": function (filename) {
         var deferred = nemo.wd.promise.defer(),
@@ -66,10 +59,7 @@ module.exports = {
 
           var imageDir = path.dirname(path.resolve(screenShotPath, imageName));
           if (!fs.existsSync(imageDir)) {
-            var error = mkdirRecursive(imageDir);
-            if (error) {
-              deferred.reject(error);
-            }
+            mkdirRecursive(imageDir);
           }
 
           imageObj.imageName = imageName;
