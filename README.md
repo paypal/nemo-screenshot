@@ -25,7 +25,7 @@ plugins: {
 driver: {
   //driver props
 }
-
+```
 The argument can either be a string which specifies the location to save the screenShots like  'path:report' or 
  an Object which has the following properties
 {
@@ -39,8 +39,6 @@ The argument can either be a string which specifies the location to save the scr
   
 'exception' takes the screenShot whenever an uncaught exception occurs  
    
-
-```
 
 ### API
 
