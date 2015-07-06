@@ -18,7 +18,7 @@ Register as "screenshot" (see below)
 plugins: {
   screenshot: {
     module: 'nemo-screenshot',
-    arguments: ['path:report']
+    arguments: [argument]
   },
   /* other plugins */
 },
@@ -26,6 +26,20 @@ driver: {
   //driver props
 }
 ```
+
+The argument can either be a string which specifies the location to save the screenShots like  'path:report' or 
+ an Object which has the following properties
+{
+        "screenShotPath" : "path:report",
+        "autoCaptureOptions" : ["click","exception"]
+}
+
+####The autocapture options
+
+'click' takes the screenShot whenever a click is performed on the webPage
+  
+'exception' takes the screenShot whenever an uncaught exception occurs  
+   
 
 ### API
 

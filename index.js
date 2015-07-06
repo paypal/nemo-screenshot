@@ -39,9 +39,22 @@ module.exports = {
    *  @param nemo {Object} - nemo namespace
    *  @param callback {Function} - errback function
    */
-  "setup": function (screenShotPath, nemo, callback) {
+
+   
 
 
+
+  "setup": function (config, nemo, callback) {
+    
+    var screenShotPath,autoCaptureOptions;
+
+    if(typeof(config) == 'string'){
+      screenShotPath = config;
+      autoCaptureOptions = [];
+    }else{
+      screenShotPath = config.screenShotPath;
+      autoCaptureOptions = config.autoCaptureOptions || [];
+    }
     var driver = nemo.driver;
     nemo.screenshot = {
       /**
@@ -51,10 +64,10 @@ module.exports = {
        *  @returns {Promise} - upon successful completion, Promise will resolve to a JSON object as below.
        *              If Jenkins environment variables are found, imageUrl will be added
        *              {
-			*								"imageName": "myImage.png", 
-			*								"imagePath": "/path/to/image/"
-			*								[, "imageUrl": "jenkinsURL"]
-			*							}
+      *               "imageName": "myImage.png", 
+      *               "imagePath": "/path/to/image/"
+      *               [, "imageUrl": "jenkinsURL"]
+      *             }
        */
       "snap": function (filename) {
         var deferred = nemo.wd.promise.defer(),
@@ -112,6 +125,40 @@ module.exports = {
           });
       }
     };
+
+    //Adding event listeners to take automatic screenshot
+
+    if(autoCaptureOptions.indexOf('click') != -1){
+      
+      nemo.driver.flow_.on('scheduleTask',function(task){
+        if(task != undefined){
+          if(task.indexOf('WebElement.')!= -1){
+            var app = task.split('.');
+            if(app[1].indexOf('click')!= -1){
+              var path = screenShotPath;
+              var filename = 'ScreenShot-' + process.pid + '-' + new Date().getTime();
+              var screenShotFileName = path + '\\' + filename;
+              nemo.screenshot.snap(screenShotFileName);
+            }
+          }
+        }
+      });
+
+    }
+
+    if(autoCaptureOptions.indexOf('exception') != -1){
+
+      nemo.driver.flow_.on('uncaughtException',function(exception){
+        var path = screenShotPath;
+        var filename = 'ScreenShot-' + process.pid + '-' + new Date().getTime();
+        var screenShotFileName = path + '\\' + filename;
+        nemo.screenshot.snap(screenShotFileName).then(function(){
+        });
+        throw exception;
+      });
+
+    }
+
     callback(null);
 
   }
