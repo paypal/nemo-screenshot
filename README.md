@@ -29,8 +29,8 @@ driver: {
 
 The plugin takes as argument the path to save the screenShots and an optional eventsArray. The events array can have one or more of the following elements.
 
-"click"     - Takes a screenshot everytime the user performs a click
-"exception" - Takes a screenshot when an exception occurs  
+* "click"     - Takes a screenshot everytime the user performs a click
+* "exception" - Takes a screenshot when an exception occurs  
 
 ### API
 

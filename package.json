@@ -29,5 +29,11 @@
     "selenium",
     "selenium-webdriver"
   ],
-  "author": "Matt Edelman"
+  "author": "Matt Edelman",
+  "contributors": [
+    {
+      "name": "Pranav M. Pranav",
+      "email": "pmpranav@paypalcorp.com"
+    }
+  ]
 }
