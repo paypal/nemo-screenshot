@@ -33,12 +33,12 @@ module.exports = {
    *  @param callback {Function} - errback function
    */
 
-   
+
 
 
 
   "setup": function (_screenShotPath, _autoCaptureOptions, _nemo, _callback) {
-    
+
     var screenShotPath,autoCaptureOptions,nemo,callback;
 
     if(arguments.length === 3){
@@ -129,15 +129,14 @@ module.exports = {
     //Adding event listeners to take automatic screenshot
 
     if(autoCaptureOptions.indexOf('click') !== -1){
-      
+
       nemo.driver.flow_.on('scheduleTask',function(task){
         if(task !== undefined){
           if(task.indexOf('WebElement.')!== -1){
             var app = task.split('.');
             if(app[1].indexOf('click')!== -1){
-              var path = screenShotPath;
               var filename = 'ScreenShot_onClick-' + process.pid + '-' + new Date().getTime();
-              var screenShotFileName = path + '\\' + filename;
+              var screenShotFileName = path.resolve(screenShotPath, filename);
               nemo.screenshot.snap(screenShotFileName);
             }
           }
@@ -149,9 +148,8 @@ module.exports = {
     if(autoCaptureOptions.indexOf('exception') !== -1){
 
       nemo.driver.flow_.on('uncaughtException',function(exception){
-        var path = screenShotPath;
         var filename = 'ScreenShot_onException-' + process.pid + '-' + new Date().getTime();
-        var screenShotFileName = path + '\\' + filename;
+        var screenShotFileName = path.resolve(screenShotPath, filename);
         nemo.screenshot.snap(screenShotFileName).then(function(){
         });
         throw exception;
