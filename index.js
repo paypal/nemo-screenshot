@@ -15,10 +15,8 @@
 'use strict';
 var fs = require('fs');
 var path = require('path');
-var mkdirRecursive = function(dirPath, mode)
-{
-  if (!fs.existsSync(dirPath))
-  {
+var mkdirRecursive = function(dirPath, mode) {
+  if (!fs.existsSync(dirPath)) {
     mkdirRecursive(path.dirname(dirPath), mode);
     fs.mkdirSync(dirPath, mode);
   }
@@ -39,13 +37,13 @@ module.exports = {
 
   "setup": function (_screenShotPath, _autoCaptureOptions, _nemo, _callback) {
 
-    var screenShotPath,autoCaptureOptions,nemo,callback;
+    var screenShotPath, autoCaptureOptions, nemo, callback;
 
     if(arguments.length === 3){
 
       screenShotPath = arguments[0];
       nemo = arguments[1];
-      callback = arguments [2];
+      callback = arguments[2];
       autoCaptureOptions = [];
     }
 
@@ -75,7 +73,8 @@ module.exports = {
       "snap": function (filename) {
         var deferred = nemo.wd.promise.defer(),
           imageName,
-          imageObj = {"imageName": null, "imagePath": null};
+          imageObj = { "imageName": null, "imagePath": null };
+
         driver.takeScreenshot().then(function (screenImg) {
           imageName = filename + ".png";
 
@@ -97,7 +96,7 @@ module.exports = {
             imageObj.imageUrl = wsImageUrl;
           }
           //save screen image
-          fs.writeFile(path.resolve(screenShotPath, imageName), screenImg, {"encoding": "base64"}, function (err) {
+          fs.writeFile(path.resolve(screenShotPath, imageName), screenImg, { "encoding": "base64" }, function (err) {
             if (err) {
               deferred.reject(err);
             } else {
@@ -114,7 +113,9 @@ module.exports = {
       "done": function (filename, done, err) {
         this.snap(filename).
           then(function (imageObject) {
-            var output = (imageObject.imageUrl) ? "\nnemo-screenshot\n" + imageObject.imageUrl + "\n" : "\nnemo-screenshot::" + JSON.stringify(imageObject) + "::nemo-screenshot";
+            var output = (imageObject.imageUrl) ?
+                "\nnemo-screenshot\n" + imageObject.imageUrl + "\n" :
+                "\nnemo-screenshot::" + JSON.stringify(imageObject) + "::nemo-screenshot";
             if (err) {
               err.stack = err.stack + output;
             }
