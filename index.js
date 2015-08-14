@@ -15,10 +15,8 @@
 'use strict';
 var fs = require('fs');
 var path = require('path');
-var mkdirRecursive = function(dirPath, mode)
-{
-  if (!fs.existsSync(dirPath))
-  {
+var mkdirRecursive = function(dirPath, mode) {
+  if (!fs.existsSync(dirPath)) {
     mkdirRecursive(path.dirname(dirPath), mode);
     fs.mkdirSync(dirPath, mode);
   }
@@ -33,29 +31,24 @@ module.exports = {
    *  @param callback {Function} - errback function
    */
 
-
-
-
-
   "setup": function (_screenShotPath, _autoCaptureOptions, _nemo, _callback) {
 
-    var screenShotPath,autoCaptureOptions,nemo,callback;
+    var screenShotPath, autoCaptureOptions, nemo, callback;
 
     if(arguments.length === 3){
 
-      screenShotPath = arguments[0];
-      nemo = arguments[1];
-      callback = arguments [2];
+      screenShotPath     = arguments[0];
+      nemo               = arguments[1];
+      callback           = arguments[2];
       autoCaptureOptions = [];
     }
 
     else if(arguments.length === 4){
 
-      screenShotPath = arguments[0];
+      screenShotPath     = arguments[0];
       autoCaptureOptions = arguments[1];
-      nemo = arguments[2];
-      callback = arguments[3];
-
+      nemo               = arguments[2];
+      callback           = arguments[3];
     }
 
     var driver = nemo.driver;
@@ -75,10 +68,9 @@ module.exports = {
       "snap": function (filename) {
         var deferred = nemo.wd.promise.defer(),
           imageName,
-          imageObj = {"imageName": null, "imagePath": null};
+          imageObj = { "imageName": null, "imagePath": null };
         driver.takeScreenshot().then(function (screenImg) {
           imageName = filename + ".png";
-
 
           var imageDir = path.dirname(path.resolve(screenShotPath, imageName));
           if (!fs.existsSync(imageDir)) {
@@ -87,6 +79,7 @@ module.exports = {
 
           imageObj.imageName = imageName;
           imageObj.imagePath = screenShotPath + imageName;
+
           //Jenkins stuff
           if (process.env.JENKINS_URL) {
             var wspace = process.env.WORKSPACE,
@@ -96,6 +89,7 @@ module.exports = {
               wsImageUrl = jurl + "job/" + jname + "/ws" + relativeImagePath + "/" + imageName;
             imageObj.imageUrl = wsImageUrl;
           }
+
           //save screen image
           fs.writeFile(path.resolve(screenShotPath, imageName), screenImg, {"encoding": "base64"}, function (err) {
             if (err) {
