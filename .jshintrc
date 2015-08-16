@@ -140,5 +140,5 @@
     // Whether strict whitespace rules apply.
     "white": false,
     // Specify indentation.
-    "indent": 2
+    "indent": 4
 }
