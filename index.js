@@ -15,13 +15,7 @@
 'use strict';
 var fs = require('fs');
 var path = require('path');
-var mkdirRecursive = function (dirPath, mode) {
-    if (!fs.existsSync(dirPath)) {
-        mkdirRecursive(path.dirname(dirPath), mode);
-        fs.mkdirSync(dirPath, mode);
-    }
-    return false;
-};
+var mkdirp = require('mkdirp');
 
 module.exports = {
     /**
@@ -79,9 +73,8 @@ module.exports = {
 
 
                     var imageDir = path.dirname(path.resolve(screenShotPath, imageName));
-                    if (!fs.existsSync(imageDir)) {
-                        mkdirRecursive(imageDir);
-                    }
+                    
+                    mkdirp.sync(imageDir);
 
                     imageObj.imageName = imageName;
                     imageObj.imagePath = screenShotPath + imageName;
