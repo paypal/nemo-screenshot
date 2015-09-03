@@ -128,6 +128,14 @@ module.exports = {
 
     //Adding event listeners to take automatic screenshot
 
+    function safeSnap(screenShotFileName){
+      try{
+        nemo.screenshot.snap(screenShotFileName);
+      }catch(e){
+        console.error('Error While Taking Screenshot : ',e);
+      }
+    }
+
     if(autoCaptureOptions.indexOf('click') !== -1){
 
       nemo.driver.flow_.on('scheduleTask',function(task){
@@ -137,7 +145,7 @@ module.exports = {
             if(app[1].indexOf('click')!== -1){
               var filename = 'ScreenShot_onClick-' + process.pid + '-' + new Date().getTime();
               var screenShotFileName = path.resolve(screenShotPath, filename);
-              nemo.screenshot.snap(screenShotFileName);
+              safeSnap(screenShotFileName);
             }
           }
         }
@@ -150,8 +158,7 @@ module.exports = {
       nemo.driver.flow_.on('uncaughtException',function(exception){
         var filename = 'ScreenShot_onException-' + process.pid + '-' + new Date().getTime();
         var screenShotFileName = path.resolve(screenShotPath, filename);
-        nemo.screenshot.snap(screenShotFileName).then(function(){
-        });
+        safeSnap(screenShotFileName);
         throw exception;
       });
 
