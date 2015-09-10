@@ -67,14 +67,14 @@ module.exports = {
             "snap": function (filename) {
                 var deferred = nemo.wd.promise.defer(),
                     imageName,
-                    imageObj = { "imageName": null, "imagePath": null };
+                    imageObj = {"imageName": null, "imagePath": null};
 
                 driver.takeScreenshot().then(function (screenImg) {
                     imageName = filename + ".png";
 
 
                     var imageDir = path.dirname(path.resolve(screenShotPath, imageName));
-                    
+
                     mkdirp.sync(imageDir);
 
                     imageObj.imageName = imageName;
@@ -91,7 +91,7 @@ module.exports = {
                     }
 
                     //save screen image
-                    fs.writeFile(path.resolve(screenShotPath, imageName), screenImg, { "encoding": "base64" }, function (err) {
+                    fs.writeFile(path.resolve(screenShotPath, imageName), screenImg, {"encoding": "base64"}, function (err) {
                         if (err) {
                             deferred.reject(err);
                         } else {
@@ -110,8 +110,8 @@ module.exports = {
                 this.snap(filename).
                     then(function (imageObject) {
                         var output = (imageObject.imageUrl) ?
-                            "\nnemo-screenshot\n" + imageObject.imageUrl + "\n" :
-                            "\nnemo-screenshot::" + JSON.stringify(imageObject) + "::nemo-screenshot";
+                        "\nnemo-screenshot\n" + imageObject.imageUrl + "\n" :
+                        "\nnemo-screenshot::" + JSON.stringify(imageObject) + "::nemo-screenshot";
                         if (err) {
                             err.stack = err.stack + output;
                         }
@@ -129,33 +129,37 @@ module.exports = {
         if (autoCaptureOptions.indexOf('click') !== -1) {
 
             flow.on('scheduleTask', function (task) {
-                if (!driver.session_) {
-                    return;
-                }
-                if (task !== undefined) {
-                    if (task.indexOf('WebElement.') !== -1) {
-                        var app = task.split('.');
-                        if (app[1].indexOf('click') !== -1) {
-                            var filename = 'ScreenShot_onClick-' + process.pid + '-' + new Date().getTime();
-                            var screenShotFileName = path.resolve(screenShotPath, filename);
-                            flow.await(nemo.screenshot.snap(screenShotFileName));
-                        }
+                driver.getSession().then(function (session) {
+                    if (session && task !== undefined && task.indexOf('WebElement.click') !== -1) {
+                        var filename = 'ScreenShot_onClick-' + process.pid + '-' + new Date().getTime();
+                        var screenShotFileName = path.resolve(screenShotPath, filename);
+                        flow.wait(function () {
+                            return nemo.screenshot.snap(screenShotFileName)
+                        }, 10000);
                     }
-                }
-            });
 
+                });
+            });
         }
 
         if (autoCaptureOptions.indexOf('exception') !== -1) {
-            flow.once('uncaughtException', function (exception) {
-                if (!driver.session_) {
-                    return;
-                }
-                var filename = 'ScreenShot_onException-' + process.pid + '-' + new Date().getTime();
-                var screenShotFileName = path.resolve(screenShotPath, filename);
-                flow.await(nemo.screenshot.snap(screenShotFileName).then(function () {
+            flow.on('uncaughtException', function (exception) {
+                if (exception._nemoScreenshotHandled) {
                     throw exception;
-                }));
+                }
+                driver.getSession().then(function (session) {
+                    if (session) {
+                        var filename = 'ScreenShot_onException-' + process.pid + '-' + new Date().getTime();
+                        var screenShotFileName = path.resolve(screenShotPath, filename);
+                        flow.wait(function () {
+                            return nemo.screenshot.snap(screenShotFileName).then(function () {
+                                exception._nemoScreenshotHandled = true;
+                                throw exception;
+                            }, 10000)
+                        });
+                    }
+                });
+
 
             });
         }
