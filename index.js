@@ -134,7 +134,7 @@ module.exports = {
                         var filename = 'ScreenShot_onClick-' + process.pid + '-' + new Date().getTime();
                         var screenShotFileName = path.resolve(screenShotPath, filename);
                         flow.wait(function () {
-                            return nemo.screenshot.snap(screenShotFileName)
+                            return nemo.screenshot.snap(screenShotFileName);
                         }, 10000);
                     }
 
@@ -155,7 +155,7 @@ module.exports = {
                             return nemo.screenshot.snap(screenShotFileName).then(function () {
                                 exception._nemoScreenshotHandled = true;
                                 throw exception;
-                            }, 10000)
+                            }, 10000);
                         });
                     }
                 });
