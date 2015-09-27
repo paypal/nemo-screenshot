@@ -1,6 +1,6 @@
 {
   "name": "nemo-screenshot",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Nemo Plugin to Use selenium-webdriver to take a screenshot",
   "registerAs": "screenshot",
   "main": "index.js",
@@ -35,5 +35,8 @@
       "name": "Pranav M. Pranav",
       "email": "pmpranav@paypalcorp.com"
     }
-  ]
+  ],
+  "dependencies": {
+    "mkdirp": "~0.5.1"
+  }
 }
