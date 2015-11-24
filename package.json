@@ -13,10 +13,10 @@
     "grunt-contrib-jshint": "~0.7.1",
     "grunt-simple-mocha": "~0.4.0",
     "mocha": "~1.10.0",
-    "nemo": "^1.0.4"
+    "nemo": "^2.0.0"
   },
   "peerDependencies": {
-    "nemo": "^1.0.4"
+    "nemo": "^2.0.0"
   },
   "repository": {
     "type": "git",
