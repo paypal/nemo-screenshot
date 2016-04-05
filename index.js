@@ -107,19 +107,18 @@ module.exports = {
             },
 
             "done": function (filename, done, err) {
-                this.snap(filename).
-                    then(function (imageObject) {
-                        var output = (imageObject.imageUrl) ?
-                        "\nnemo-screenshot\n" + imageObject.imageUrl + "\n" :
-                        "\nnemo-screenshot::" + JSON.stringify(imageObject) + "::nemo-screenshot";
-                        if (err) {
-                            err.stack = err.stack + output;
-                        }
-                        done(err);
-                    }, function (scerror) {
-                        console.log("nemo-screenshot encountered some error.", scerror.toString());
-                        done(scerror);
-                    });
+                this.snap(filename).then(function (imageObject) {
+                    var output = (imageObject.imageUrl) ?
+                    "\nnemo-screenshot\n" + imageObject.imageUrl + "\n" :
+                    "\nnemo-screenshot::" + JSON.stringify(imageObject) + "::nemo-screenshot";
+                    if (err) {
+                        err.stack = err.stack + output;
+                    }
+                    done(err);
+                }, function (scerror) {
+                    console.log("nemo-screenshot encountered some error.", scerror.toString());
+                    done(scerror);
+                });
             }
         };
 
@@ -151,11 +150,11 @@ module.exports = {
                     if (session) {
                         var filename = 'ScreenShot_onException-' + process.pid + '-' + new Date().getTime();
                         var screenShotFileName = path.resolve(screenShotPath, filename);
-                        flow.wait(function () {
-                            return nemo.screenshot.snap(screenShotFileName).then(function () {
-                                exception._nemoScreenshotHandled = true;
-                                throw exception;
-                            }, 10000);
+                        nemo.screenshot.snap(screenShotFileName).then(function () {
+                            exception._nemoScreenshotHandled = true;
+                            throw exception;
+                        }, function (err) {
+                            throw err;
                         });
                     }
                 });
