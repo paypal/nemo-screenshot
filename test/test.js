@@ -59,12 +59,7 @@ describe('nemo-screenshot', function () {
     //
     //
     //});
-    afterEach(function(done) {
-      //cleaner(function() {
-        done();
-      //});
 
-    });
     it('will get @setup@', function (done) {
         assert(nemo.screenshot);
         done();
