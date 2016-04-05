@@ -32,12 +32,8 @@
     "selenium-webdriver"
   ],
   "author": "Matt Edelman",
-  "contributors": [
-    {
-      "name": "Pranav M. Pranav",
-      "email": "pmpranav@paypalcorp.com"
-    }
-  ],
+  "contributors": ["Pranav M. Pranav <pmpranav@paypalcorp.com>",
+    "Krzysztof Ostrowski <krzysztof.ostrowski@posteo.de>"],
   "dependencies": {
     "mkdirp": "~0.5.1"
   }
