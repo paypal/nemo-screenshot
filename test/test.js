@@ -23,10 +23,11 @@ var cleaner = function (cb) {
     fs.rmdir(path.resolve(__dirname, 'report'), function (err) {
       //ignore errors
       cb();
-    })
+    });
   });
 };
 describe('nemo-screenshot', function () {
+
   before(function (done) {
     cleaner(function () {
       nemo = Nemo(basedir, config, function (err) {
@@ -35,26 +36,26 @@ describe('nemo-screenshot', function () {
         }
         done();
       });
-    })
-
-
   });
+  });
+
   after(function (done) {
       nemo.driver.quit().then(function () {
         done();
     });
-
   });
+
   afterEach(function (done) {
     cleaner(function () {
       done();
     });
-
   });
+
   it('will get @setup@', function (done) {
     assert(nemo.screenshot);
     done();
   });
+
   it('will use @snap@ to take a screenshot', function (done) {
     nemo.driver.get('http://www.google.com');
     nemo.screenshot.snap('goog').then(function () {
@@ -64,12 +65,14 @@ describe('nemo-screenshot', function () {
     });
 
   });
+
   it('will use @done@ to take a screenshot', function (done) {
     nemo.screenshot.done('goog', function fakeDone() {
       assert(fs.statSync(path.resolve(__dirname, 'report/goog.png')));
       done();
     });
   });
+
   it('will use @done@error@ to take a screenshot in an error scenario', function(done) {
     nemo.screenshot.done('goog', function fakeDone(err) {
       assert(err.stack.indexOf('nemo-screenshot') !== -1);
@@ -77,4 +80,5 @@ describe('nemo-screenshot', function () {
       done();
     }, new Error('my error'));
   });
+
 });
