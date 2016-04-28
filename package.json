@@ -8,12 +8,12 @@
     "test": "grunt"
   },
   "devDependencies": {
-    "chai": "~1.6.0",
-    "grunt": "~0.4.1",
-    "grunt-contrib-jshint": "~0.7.1",
-    "grunt-simple-mocha": "~0.4.0",
-    "mocha": "~1.10.0",
-    "nemo": "^2.0.0"
+    "chai": "^3.5.0",
+    "grunt": "^1.0.1",
+    "grunt-contrib-jshint": "^1.0.0",
+    "grunt-simple-mocha": "^0.4.1",
+    "mocha": "^2.4.5",
+    "nemo": "^2.1.1"
   },
   "peerDependencies": {
     "nemo": "^2.0.0"
@@ -30,13 +30,18 @@
     "selenium-webdriver"
   ],
   "author": "Matt Edelman",
-  "contributors": [
-    {
-      "name": "Pranav M. Pranav",
-      "email": "pmpranav@paypalcorp.com"
-    }
-  ],
+  "contributors": [{
+    "name": "Pranav M. Pranav",
+    "email": "pmpranav@paypalcorp.com"
+  },{
+    "name": "Gabriel J. Csapo",
+    "email": "gabecsapo@gmail.com"
+  }],
   "dependencies": {
-    "mkdirp": "~0.5.1"
-  }
+    "mkdirp": "^0.5.1"
+  },
+  "licenses": [{
+    "type": "Apache 2.0",
+    "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+  }]
 }
