@@ -66,7 +66,6 @@ describe('nemo-screenshot', function () {
         done();
     });
     it('will use @snap@ to take a screenshot', function (done) {
-        this.timeout(50000);
         nemo.driver.get('http://www.google.com');
         nemo.screenshot.snap('goog').then(function () {
             //verify file exists
