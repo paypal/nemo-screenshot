@@ -36,8 +36,9 @@ describe('nemo-screenshot', function () {
             nemo = Nemo(basedir, config, function (err) {
                 if (err) {
                     done(err);
+                } else {
+                    done();
                 }
-                done();
             });
         })
 
@@ -80,18 +81,18 @@ describe('nemo-screenshot', function () {
         });
     });
     // not sure how to test this as an uncaughtException ALWAYS fails a mocha test
-    //it('will take a screenshot for an uncaughtException event', function (done) {
-    //        nemo.driver.get('http://www.google.com');
-    //        nemo.driver.findElement(nemo.wd.By.name('sfsfq')).sendKeys('foobar');
-    //        nemo.driver.sleep(1).then(function () {
-    //            console.log('foo')
-    //        }, function (err) {
-    //            done();
-    //        }).thenCatch(function (err) {
-    //            done();
-    //        });
-    //
-    //});
+    // it('will take a screenshot for an uncaughtException event', function (done) {
+    //     nemo.driver.get('http://www.google.com');
+    //     nemo.driver.findElement(nemo.wd.By.name('sfsfq')).sendKeys('foobar');
+    //     nemo.driver.sleep(1).then(function () {
+    //         console.log('foo')
+    //     }, function (err) {
+    //         done();
+    //     }).thenCatch(function (err) {
+    //         done();
+    //     });
+    // });
+
     it('will use @done@error@ to take a screenshot in an error scenario', function (done) {
         nemo.screenshot.done('goog', function fakeDone(err) {
             assert(err.stack.indexOf('nemo-screenshot') !== -1);

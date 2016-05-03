@@ -8,13 +8,14 @@
     "test": "grunt"
   },
   "devDependencies": {
-    "chai": "~1.6.0",
+    "chai": "^3.5.0",
     "glob": "^7.0.3",
-    "grunt": "~0.4.1",
-    "grunt-contrib-jshint": "~0.7.1",
-    "grunt-simple-mocha": "~0.4.0",
+    "grunt": "^1.0.1",
+    "grunt-contrib-jshint": "^1.0.0",
+    "grunt-simple-mocha": "^0.4.1",
     "mocha": "^2.4.5",
-    "nemo": "^2.0.0",
+    "nemo": "^2.1.1",
+    "phantomjs": "^2.1.7",
     "rimraf": "^2.5.2"
   },
   "peerDependencies": {
@@ -34,9 +35,16 @@
   "author": "Matt Edelman",
   "contributors": [
     "Pranav M. Pranav <pmpranav@paypalcorp.com>",
-    "Krzysztof Ostrowski <krzysztof.ostrowski@posteo.de>"
+    "Krzysztof Ostrowski <krzysztof.ostrowski@posteo.de>",
+    "Gabriel J. Csapo <gabecsapo@gmail.com>"
   ],
   "dependencies": {
-    "mkdirp": "~0.5.1"
-  }
+    "mkdirp": "^0.5.1"
+  },
+  "licenses": [
+    {
+      "type": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  ]
 }
