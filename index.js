@@ -161,8 +161,6 @@ module.exports = {
 
                 driver.getSession().then(function (session) {
                     if (session) {
-                        exception._nemoScreenshotHandled = true;
-
                         var filename;
                         var testTitle = nemo.screenshot._currentTestTitle;
                         if (testTitle) {
@@ -178,17 +176,15 @@ module.exports = {
                             return nemo.screenshot.snap(screenShotFileName).then(function (imageObject) {
                                 appendImageUrlToErrorStack(imageObject, exception);
                                 throw exception;
-                            }, 10000);
-                        });
+                            });
+                        }, 10000);
+                    } else {
+                        throw exception;
                     }
                 }).thenCatch(function(e) {
-                    // To prevent an infinite exception handling loop if there is any error
-                    // when trying to snap screenshot
-                    if (e._nemoScreenshotHandled) {
-                        throw e;
-                    } else {
-                        console.log('nemo-screenshot encountered some error', e.toString());
-                    }
+                    // Catch all exceptions to prevent an infnite uncaught exception loop
+                    e._nemoScreenshotHandled = true;
+                    throw e;
                 });
             });
         }
