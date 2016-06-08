@@ -14,6 +14,7 @@ Register as "screenshot" (see below)
 
 * `npm install --save-dev nemo-screenshot@^v1.0.0`
 * Add this to your Nemo plugins configuration (adjust `arguments` according to where you want screenshots to be saved):
+
 ```javascript
 plugins: {
   screenshot: {
@@ -27,10 +28,10 @@ driver: {
 }
 ```
 
-The plugin takes as argument the path to save the screenShots and an optional eventsArray. The events array can have one or more of the following elements.
+The plugin takes as argument the path to save the screenshots and an optional `eventsArray`. The events array can have one or more of the following elements.
 
-* "click"     - Takes a screenshot everytime the user performs a click
-* "exception" - Takes a screenshot when an exception occurs  
+* `"click"`   - Takes a screenshot everytime the user performs a click
+* `"exception"` - Takes a screenshot when an exception occurs
 
 ### API
 
@@ -68,3 +69,9 @@ Usage example:
     });
   });
 ```
+
+#### screenshot.setCurrentTestTitle
+
+If set, the test title will be used as the screenshot filename when an exception occurs. Default screenshot filename is `ScreenShot_onException-[process_id]-[timestamp].png`, which is not easy to identify the failing test case.
+
+* `@argument testTitle {String}` current test title
