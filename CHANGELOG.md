@@ -1,6 +1,6 @@
 # nemo-screenshot changelog
 
-## unreleased
+## v2.1.0
 
 * upgrade versions of dev dependencies. jshintrc changes. update license. please see: https://github.com/paypal/nemo-screenshot/pull/37
 * feature: `setCurrentTestTitle` feature. please see: https://github.com/paypal/nemo-screenshot/pull/42
