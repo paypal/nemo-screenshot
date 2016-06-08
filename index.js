@@ -17,6 +17,24 @@ var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');
 
+function titleSlug(title) {
+    if (!title) {
+        return '';
+    }
+
+    return title.trim().replace(/\W/g, '_').substring(0, 251);
+}
+
+function appendImageUrlToErrorStack(imageObject, err) {
+    var output = (imageObject.imageUrl) ?
+        "\nnemo-screenshot\n" + imageObject.imageUrl + "\n" :
+        "\nnemo-screenshot::" + JSON.stringify(imageObject) + "::nemo-screenshot";
+
+    if (err) {
+        err.stack = err.stack + output;
+    }
+}
+
 module.exports = {
     /**
      *  setup - initialize this functionality during nemo.setup
@@ -24,11 +42,6 @@ module.exports = {
      *  @param nemo {Object} - nemo namespace
      *  @param callback {Function} - errback function
      */
-
-
-
-
-
     "setup": function (_screenShotPath, _autoCaptureOptions, _nemo, _callback) {
 
         var screenShotPath, autoCaptureOptions, nemo, callback, driver, flow;
@@ -72,7 +85,6 @@ module.exports = {
                 driver.takeScreenshot().then(function (screenImg) {
                     imageName = filename + ".png";
 
-
                     var imageDir = path.dirname(path.resolve(screenShotPath, imageName));
 
                     mkdirp.sync(imageDir);
@@ -109,17 +121,16 @@ module.exports = {
             "done": function (filename, done, err) {
                 this.snap(filename).
                     then(function (imageObject) {
-                        var output = (imageObject.imageUrl) ?
-                        "\nnemo-screenshot\n" + imageObject.imageUrl + "\n" :
-                        "\nnemo-screenshot::" + JSON.stringify(imageObject) + "::nemo-screenshot";
-                        if (err) {
-                            err.stack = err.stack + output;
-                        }
+                        appendImageUrlToErrorStack(imageObject, err);
                         done(err);
                     }, function (scerror) {
                         console.log("nemo-screenshot encountered some error.", scerror.toString());
                         done(scerror);
                     });
+            },
+
+            "setCurrentTestTitle": function(title) {
+                this._currentTestTitle = title;
             }
         };
 
@@ -147,20 +158,34 @@ module.exports = {
                 if (exception._nemoScreenshotHandled) {
                     throw exception;
                 }
+
                 driver.getSession().then(function (session) {
                     if (session) {
-                        var filename = 'ScreenShot_onException-' + process.pid + '-' + new Date().getTime();
+                        var filename;
+                        var testTitle = nemo.screenshot._currentTestTitle;
+                        if (testTitle) {
+                            filename = titleSlug(testTitle);
+                        }
+
+                        if (!filename) {
+                            filename = 'ScreenShot_onException-' + process.pid + '-' + new Date().getTime();
+                        }
+
                         var screenShotFileName = path.resolve(screenShotPath, filename);
                         flow.wait(function () {
-                            return nemo.screenshot.snap(screenShotFileName).then(function () {
-                                exception._nemoScreenshotHandled = true;
+                            return nemo.screenshot.snap(screenShotFileName).then(function (imageObject) {
+                                appendImageUrlToErrorStack(imageObject, exception);
                                 throw exception;
-                            }, 10000);
-                        });
+                            });
+                        }, 10000);
+                    } else {
+                        throw exception;
                     }
+                }).thenCatch(function(e) {
+                    // Catch all exceptions to prevent an infnite uncaught exception loop
+                    e._nemoScreenshotHandled = true;
+                    throw e;
                 });
-
-
             });
         }
         callback(null);
