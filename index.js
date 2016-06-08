@@ -158,7 +158,7 @@ module.exports = {
                 if (exception._nemoScreenshotHandled) {
                     throw exception;
                 }
-
+                exception._nemoScreenshotHandled = true;
                 driver.getSession().then(function (session) {
                     if (session) {
                         var filename;
