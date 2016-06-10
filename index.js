@@ -17,6 +17,24 @@ var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');
 
+function titleSlug(title) {
+    if (!title) {
+        return '';
+    }
+
+    return title.trim().replace(/\W/g, '_').substring(0, 251);
+}
+
+function appendImageUrlToErrorStack(imageObject, err) {
+    var output = (imageObject.imageUrl) ?
+        '\nnemo-screenshot\n' + imageObject.imageUrl + '\n' :
+        '\nnemo-screenshot::' + JSON.stringify(imageObject) + '::nemo-screenshot';
+
+    if (err) {
+        err.stack = err.stack + output;
+    }
+}
+
 module.exports = {
     /**
      *  setup - initialize this functionality during nemo.setup
@@ -46,6 +64,7 @@ module.exports = {
 
         driver = nemo.driver;
         flow = nemo.driver.controlFlow();
+
         nemo.screenshot = {
             /**
              *  snap - save a screenshot image as PNG to the 'report' directory
@@ -66,8 +85,6 @@ module.exports = {
 
                 driver.takeScreenshot().then(function (screenImg) {
                     imageName = filename + '.png';
-
-
                     var imageDir = path.dirname(path.resolve(screenShotPath, imageName));
 
                     mkdirp.sync(imageDir);
@@ -92,7 +109,6 @@ module.exports = {
                         } else {
                             deferred.fulfill(imageObj);
                         }
-
                     });
                 }, function (err) {
                     deferred.reject(err);
@@ -104,25 +120,21 @@ module.exports = {
             'done': function (filename, done, err) {
                 this.snap(filename).
                     then(function (imageObject) {
-                        var output = (imageObject.imageUrl) ?
-                        '\nnemo-screenshot\n' + imageObject.imageUrl + '\n' :
-                        '\nnemo-screenshot::' + JSON.stringify(imageObject) + '::nemo-screenshot';
-                        if (err) {
-                            err.stack = err.stack + output;
-                        }
+                        appendImageUrlToErrorStack(imageObject, err);
                         done(err);
                     }, function (scerror) {
                         console.log('nemo-screenshot encountered some error.', scerror.toString());
                         done(scerror);
                     });
+            },
+
+            'setCurrentTestTitle': function(title) {
+                this._currentTestTitle = title;
             }
         };
 
         //Adding event listeners to take automatic screenshot
-
-        //Adding event listeners to take automatic screenshot
         if (autoCaptureOptions.indexOf('click') !== -1) {
-
             flow.on('scheduleTask', function (task) {
                 driver.getSession().then(function (session) {
                     if (session && task !== undefined && task.indexOf('WebElement.click') !== -1) {
@@ -132,7 +144,6 @@ module.exports = {
                             return nemo.screenshot.snap(screenShotFileName);
                         }, 10000);
                     }
-
                 });
             });
         }
@@ -142,22 +153,31 @@ module.exports = {
                 if (exception._nemoScreenshotHandled) {
                     throw exception;
                 }
+                exception._nemoScreenshotHandled = true;
                 driver.getSession().then(function (session) {
                     if (session) {
                         var filename = 'ScreenShot_onException-' + process.pid + '-' + new Date().getTime();
+                        var testTitle = nemo.screenshot._currentTestTitle;
+
+                        if (testTitle) {
+                            filename = titleSlug(testTitle);
+                        }
+
                         var screenShotFileName = path.resolve(screenShotPath, filename);
-                        nemo.screenshot.snap(screenShotFileName).then(function () {
-                            exception._nemoScreenshotHandled = true;
+                        nemo.screenshot.snap(screenShotFileName).then(function (imageObject) {
+                            appendImageUrlToErrorStack(imageObject, exception);
                             throw exception;
-                        }, function (err) {
-                            throw err;
                         });
+                    } else {
+                        throw exception;
                     }
+                }).thenCatch(function(e) {
+                    e._nemoScreenshotHandled = true;
+                    throw e;
                 });
-
-
             });
         }
+
         callback(null);
     }
 };
