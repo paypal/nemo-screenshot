@@ -31,7 +31,7 @@ module.exports = {
 
     "setup": function (_screenShotPath, _autoCaptureOptions, _nemo, _callback) {
 
-        var screenShotPath, autoCaptureOptions, nemo, callback, driver, flow;
+        var screenShotPath, autoCaptureOptions, nemo, callback, driver, flow, scheduleTask, uncaughtException;
 
         if (arguments.length === 3) {
 
@@ -50,6 +50,8 @@ module.exports = {
         }
 
         driver = nemo.driver;
+        scheduleTask = nemo.wd.promise.ControlFlow.EventType.SCHEDULE_TASK;
+        uncaughtException = nemo.wd.promise.ControlFlow.EventType.UNCAUGHT_EXCEPTION;
         flow = nemo.driver.controlFlow();
         nemo.screenshot = {
             /**
@@ -128,7 +130,7 @@ module.exports = {
         //Adding event listeners to take automatic screenshot
         if (autoCaptureOptions.indexOf('click') !== -1) {
 
-            flow.on('scheduleTask', function (task) {
+            flow.on(scheduleTask, function (task) {
                 driver.getSession().then(function (session) {
                     if (session && task !== undefined && task.indexOf('WebElement.click') !== -1) {
                         var filename = 'ScreenShot_onClick-' + process.pid + '-' + new Date().getTime();
@@ -143,7 +145,7 @@ module.exports = {
         }
 
         if (autoCaptureOptions.indexOf('exception') !== -1) {
-            flow.on('uncaughtException', function (exception) {
+            flow.on(uncaughtException, function (exception) {
                 if (exception._nemoScreenshotHandled) {
                     throw exception;
                 }
