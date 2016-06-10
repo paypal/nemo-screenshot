@@ -101,4 +101,15 @@ describe('nemo-screenshot', function () {
         }, new Error('my error'));
     });
 
+    it('will match @Event@ type enumerations to regular strings', function (done) {
+      //This test is not exactly testing nemo-screenshot functionality, However,
+      //in future if new version of WebDriverJS changes object structure of enumerations below, this test will fail
+      //and that will prevent us from breaking this package
+      var scheduleTask = nemo.wd.promise.ControlFlow.EventType.SCHEDULE_TASK,
+        uncaughtException = nemo.wd.promise.ControlFlow.EventType.UNCAUGHT_EXCEPTION;
+      assert.equal(scheduleTask == 'scheduleTask', true);
+      assert.equal(uncaughtException == 'uncaughtException', true);
+      done();
+    });
+
 });
