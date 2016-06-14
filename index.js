@@ -25,14 +25,36 @@ function titleSlug(title) {
     return title.trim().replace(/\W/g, '_').substring(0, 251);
 }
 
-function appendImageUrlToErrorStack(imageObject, err) {
-    var output = (imageObject.imageUrl) ?
-        "\nnemo-screenshot\n" + imageObject.imageUrl + "\n" :
-        "\nnemo-screenshot::" + JSON.stringify(imageObject) + "::nemo-screenshot";
+function appendImageUrlToStackSrace(imageObject, err) {
+    var jenkinsImageUrls = imageObject.jenkinsImageUrls;
+    var output;
+
+    if (jenkinsImageUrls) {
+        output = '\nnemo-screenshot (workspace): ' + jenkinsImageUrls.workspaceUrl + '\n' +
+                 'nemo-screenshot (archived): ' + jenkinsImageUrls.archivedUrl + '\n';
+    } else {
+        output = '\nnemo-screenshot::' + JSON.stringify(imageObject) + '::nemo-screenshot';
+    }
 
     if (err) {
         err.stack = err.stack + output;
     }
+}
+
+function formatJenkinsImageUrls(screenShotPath, imageName) {
+    var jenkinsUrl = process.env.JENKINS_URL,
+        buildUrl = process.env.BUILD_URL,
+        jobName = process.env.JOB_NAME,
+        workspace = process.env.WORKSPACE,
+        relImagePath = screenShotPath.substr(workspace.length);
+
+    var workspaceUrl = jenkinsUrl + 'job/' + jobName + '/ws' + relImagePath + '/' + imageName;
+    var archivedUrl = buildUrl + 'artifact' + relImagePath + '/' + imageName;
+
+    return {
+        workspaceUrl: workspaceUrl,
+        archivedUrl: archivedUrl
+    };
 }
 
 module.exports = {
@@ -70,11 +92,11 @@ module.exports = {
              *  @param filename {String} - should be unique within the report directory and indicate which
              *                test it is associated with
              *  @returns {Promise} - upon successful completion, Promise will resolve to a JSON object as below.
-             *              If Jenkins environment variables are found, imageUrl will be added
+             *              If Jenkins environment variables are found, jenkinsImageUrls will be added
              *              {
              *                  "imageName": "myImage.png",
              *                  "imagePath": "/path/to/image/"
-             *                  [, "imageUrl": "jenkinsURL"]
+             *                  [ "jenkinsImageUrls": { workspaceUrl: "jenkinsUrl", archivedUrl: "jenkinsUrl" } ]
              *              }
              */
             "snap": function (filename) {
@@ -85,25 +107,21 @@ module.exports = {
                 driver.takeScreenshot().then(function (screenImg) {
                     imageName = filename + ".png";
 
-                    var imageDir = path.dirname(path.resolve(screenShotPath, imageName));
+                    var imageDir = path.resolve(screenShotPath);
+                    var imageFullPath = path.join(imageDir, imageName);
 
                     mkdirp.sync(imageDir);
 
                     imageObj.imageName = imageName;
-                    imageObj.imagePath = screenShotPath + imageName;
+                    imageObj.imagePath = imageFullPath;
 
                     //Jenkins stuff
                     if (process.env.JENKINS_URL) {
-                        var wspace = process.env.WORKSPACE,
-                            jurl = process.env.JENKINS_URL,
-                            jname = process.env.JOB_NAME,
-                            relativeImagePath = screenShotPath.substr(wspace.length),
-                            wsImageUrl = jurl + "job/" + jname + "/ws" + relativeImagePath + "/" + imageName;
-                        imageObj.imageUrl = wsImageUrl;
+                        imageObj.jenkinsImageUrls = formatJenkinsImageUrls(screenShotPath, imageName);
                     }
 
                     //save screen image
-                    fs.writeFile(path.resolve(screenShotPath, imageName), screenImg, {"encoding": "base64"}, function (err) {
+                    fs.writeFile(imageFullPath, screenImg, {"encoding": "base64"}, function (err) {
                         if (err) {
                             deferred.reject(err);
                         } else {
@@ -121,7 +139,7 @@ module.exports = {
             "done": function (filename, done, err) {
                 this.snap(filename).
                     then(function (imageObject) {
-                        appendImageUrlToErrorStack(imageObject, err);
+                        appendImageUrlToStackSrace(imageObject, err);
                         done(err);
                     }, function (scerror) {
                         console.log("nemo-screenshot encountered some error.", scerror.toString());
@@ -143,9 +161,8 @@ module.exports = {
                 driver.getSession().then(function (session) {
                     if (session && task !== undefined && task.indexOf('WebElement.click') !== -1) {
                         var filename = 'ScreenShot_onClick-' + process.pid + '-' + new Date().getTime();
-                        var screenShotFileName = path.resolve(screenShotPath, filename);
                         flow.wait(function () {
-                            return nemo.screenshot.snap(screenShotFileName);
+                            return nemo.screenshot.snap(filename);
                         }, 10000);
                     }
 
@@ -171,10 +188,9 @@ module.exports = {
                             filename = 'ScreenShot_onException-' + process.pid + '-' + new Date().getTime();
                         }
 
-                        var screenShotFileName = path.resolve(screenShotPath, filename);
                         flow.wait(function () {
-                            return nemo.screenshot.snap(screenShotFileName).then(function (imageObject) {
-                                appendImageUrlToErrorStack(imageObject, exception);
+                            return nemo.screenshot.snap(filename).then(function (imageObject) {
+                                appendImageUrlToStackSrace(imageObject, exception);
                                 throw exception;
                             });
                         }, 10000);
