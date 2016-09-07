@@ -1,5 +1,9 @@
 # nemo-screenshot changelog
 
+## v2.2.0
+
+* fix Jenkins image URLs and add new archivedImageUrl. See https://github.com/paypal/nemo-screenshot/pull/49
+
 ## v2.1.0
 
 * upgrade versions of dev dependencies. jshintrc changes. update license. please see: https://github.com/paypal/nemo-screenshot/pull/37
