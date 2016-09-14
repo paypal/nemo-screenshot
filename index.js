@@ -134,7 +134,8 @@ module.exports = {
                     var imageDir = path.resolve(screenShotPath);
                     var imageFullPath = path.join(imageDir, imageName);
 
-                    mkdirp.sync(imageDir);
+                    // create directories all the way nested down to the last level
+                    mkdirp.sync(imageFullPath.substr(0, imageFullPath.lastIndexOf('/')));
 
                     imageObj.imageName = imageName;
                     imageObj.imagePath = imageFullPath;
