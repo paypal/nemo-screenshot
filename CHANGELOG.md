@@ -1,9 +1,5 @@
 # nemo-screenshot changelog
 
-## v2.2.1
-
-* fix screenshot directory creation logic. See https://github.com/paypal/nemo-screenshot/pull/52
-
 ## v2.2.0
 
 * fix Jenkins image URLs and add new archivedImageUrl. See https://github.com/paypal/nemo-screenshot/pull/49
