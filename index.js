@@ -25,13 +25,59 @@ function titleSlug(title) {
     return title.trim().replace(/\W/g, '_').substring(0, 251);
 }
 
-function appendImageUrlToErrorStack(imageObject, err) {
-    var output = (imageObject.imageUrl) ?
-        '\nnemo-screenshot\n' + imageObject.imageUrl + '\n' :
-        '\nnemo-screenshot::' + JSON.stringify(imageObject) + '::nemo-screenshot';
+function appendImageUrlToStackTrace(imageObject, err) {
+    var output;
+
+    if (imageObject.imageUrl || imageObject.archivedImageUrl) {
+        output = '\n';
+        if (imageObject.imageUrl) {
+            output += 'nemo-screenshot (workspace): ' + imageObject.imageUrl + '\n';
+        }
+
+        if (imageObject.archivedImageUrl) {
+            output += 'nemo-screenshot (archived): ' + imageObject.archivedImageUrl + '\n';
+        }
+    } else {
+        output = '\nnemo-screenshot::' + JSON.stringify(imageObject) + '::nemo-screenshot';
+    }
 
     if (err) {
         err.stack = err.stack + output;
+    }
+}
+
+function formatJenkinsImageUrls(screenShotPath, imageName) {
+    var jenkinsUrl = process.env.JENKINS_URL,
+        buildUrl = process.env.BUILD_URL,
+        jobName = process.env.JOB_NAME,
+        workspace = process.env.WORKSPACE,
+        imageUrl, archivedImageUrl;
+
+    if (!workspace) {
+        console.log('nemo-screenshot was unable to format Jenkins image URLs: ' +
+            'WORKSPACE env variable is not defined');
+        return null;
+    }
+
+    var relImagePath = screenShotPath.substr(workspace.length);
+    if (jobName) {
+        imageUrl = jenkinsUrl + 'job/' + jobName + '/ws' + relImagePath + '/' + imageName;
+    } else {
+        console.log('nemo-screenshot was unable to format Jenkins workspace image URL: ' +
+            'JOB_NAME env variable is not defined');
+    }
+
+    if (buildUrl) {
+        archivedImageUrl = buildUrl + 'artifact' + relImagePath + '/' + imageName;
+    }
+
+    if (imageUrl || archivedImageUrl) {
+        return {
+            imageUrl: imageUrl,
+            archivedImageUrl: archivedImageUrl
+        };
+    } else {
+        return null;
     }
 }
 
@@ -44,18 +90,15 @@ module.exports = {
      */
     'setup': function (_screenShotPath, _autoCaptureOptions, _nemo, _callback) {
 
-        var screenShotPath, autoCaptureOptions, nemo, callback, driver, flow;
+        var screenShotPath, autoCaptureOptions, nemo, callback, driver, flow, scheduleTask, uncaughtException;
 
         if (arguments.length === 3) {
-
             screenShotPath = arguments[0];
             nemo = arguments[1];
             callback = arguments[2];
             autoCaptureOptions = [];
-        }
 
-        else if (arguments.length === 4) {
-
+        } else if (arguments.length === 4) {
             screenShotPath = arguments[0];
             autoCaptureOptions = arguments[1];
             nemo = arguments[2];
@@ -63,47 +106,53 @@ module.exports = {
         }
 
         driver = nemo.driver;
+        scheduleTask = nemo.wd.promise.ControlFlow.EventType.SCHEDULE_TASK;
+        uncaughtException = nemo.wd.promise.ControlFlow.EventType.UNCAUGHT_EXCEPTION;
         flow = nemo.driver.controlFlow();
 
         nemo.screenshot = {
             /**
              *  snap - save a screenshot image as PNG to the 'report' directory
              *  @param filename {String} - should be unique within the report directory and indicate which
-             *                test it is associated with
+             *                             test it is associated with
              *  @returns {Promise} - upon successful completion, Promise will resolve to a JSON object as below.
-             *              If Jenkins environment variables are found, imageUrl will be added
-             *              {
-             *                  'imageName': 'myImage.png',
-             *                  'imagePath': '/path/to/image/'
-             *                  [, 'imageUrl': 'jenkinsURL']
-             *              }
+             *                       If Jenkins environment variables are found, Jenkins image URLs will be added
+             *                       {
+             *                           'imageName': 'myImage.png',
+             *                           'imagePath': '/path/to/image/'
+             *                           [, 'imageUrl': 'jenkinsUrl', 'archivedImageUrl': 'jenkinsUrl' ]
+             *                       }
              */
             'snap': function (filename) {
                 var deferred = nemo.wd.promise.defer(),
-                    imageName,
-                    imageObj = {'imageName': null, 'imagePath': null};
+                    imageObj = {},
+                    imageName;
 
                 driver.takeScreenshot().then(function (screenImg) {
                     imageName = filename + '.png';
-                    var imageDir = path.dirname(path.resolve(screenShotPath, imageName));
 
-                    mkdirp.sync(imageDir);
+                    var imageDir = path.resolve(screenShotPath);
+                    var imageFullPath = path.join(imageDir, imageName);
+
+                    // create directories all the way nested down to the last level
+                    mkdirp.sync(path.dirname(imageFullPath));
 
                     imageObj.imageName = imageName;
-                    imageObj.imagePath = screenShotPath + imageName;
+                    imageObj.imagePath = imageFullPath;
 
-                    //Jenkins stuff
+                    // Jenkins stuff
                     if (process.env.JENKINS_URL) {
-                        var wspace = process.env.WORKSPACE,
-                            jurl = process.env.JENKINS_URL,
-                            jname = process.env.JOB_NAME,
-                            relativeImagePath = screenShotPath.substr(wspace.length),
-                            wsImageUrl = jurl + 'job/' + jname + '/ws' + relativeImagePath + '/' + imageName;
-                        imageObj.imageUrl = wsImageUrl;
+                        var imageUrls = formatJenkinsImageUrls(screenShotPath, imageName);
+                        if (imageUrls) {
+                            imageObj.imageUrl = imageUrls.imageUrl;
+                            imageObj.archivedImageUrl = imageUrls.archivedImageUrl;
+                        }
                     }
 
-                    //save screen image
-                    fs.writeFile(path.resolve(screenShotPath, imageName), screenImg, {'encoding': 'base64'}, function (err) {
+                    // save screen image
+                    fs.writeFile(imageFullPath, screenImg, {
+                        'encoding': 'base64'
+                    }, function (err) {
                         if (err) {
                             deferred.reject(err);
                         } else {
@@ -118,30 +167,28 @@ module.exports = {
             },
 
             'done': function (filename, done, err) {
-                this.snap(filename).
-                    then(function (imageObject) {
-                        appendImageUrlToErrorStack(imageObject, err);
-                        done(err);
-                    }, function (scerror) {
-                        console.log('nemo-screenshot encountered some error.', scerror.toString());
-                        done(scerror);
-                    });
+                this.snap(filename).then(function (imageObject) {
+                    appendImageUrlToStackTrace(imageObject, err);
+                    done(err);
+                }, function (scerror) {
+                    console.log('nemo-screenshot encountered some error.', scerror.toString());
+                    done(scerror);
+                });
             },
 
-            'setCurrentTestTitle': function(title) {
+            'setCurrentTestTitle': function (title) {
                 this._currentTestTitle = title;
             }
         };
 
-        //Adding event listeners to take automatic screenshot
+        // Adding event listeners to take automatic screenshot
         if (autoCaptureOptions.indexOf('click') !== -1) {
-            flow.on('scheduleTask', function (task) {
+            flow.on(scheduleTask, function (task) {
                 driver.getSession().then(function (session) {
                     if (session && task !== undefined && task.indexOf('WebElement.click') !== -1) {
                         var filename = 'ScreenShot_onClick-' + process.pid + '-' + new Date().getTime();
-                        var screenShotFileName = path.resolve(screenShotPath, filename);
                         flow.wait(function () {
-                            return nemo.screenshot.snap(screenShotFileName);
+                            return nemo.screenshot.snap(filename);
                         }, 10000);
                     }
                 });
@@ -149,7 +196,7 @@ module.exports = {
         }
 
         if (autoCaptureOptions.indexOf('exception') !== -1) {
-            flow.on('uncaughtException', function (exception) {
+            flow.on(uncaughtException, function (exception) {
                 if (exception._nemoScreenshotHandled) {
                     throw exception;
                 }
@@ -163,15 +210,14 @@ module.exports = {
                             filename = titleSlug(testTitle);
                         }
 
-                        var screenShotFileName = path.resolve(screenShotPath, filename);
-                        nemo.screenshot.snap(screenShotFileName).then(function (imageObject) {
-                            appendImageUrlToErrorStack(imageObject, exception);
+                        nemo.screenshot.snap(filename).then(function (imageObject) {
+                            appendImageUrlToStackTrace(imageObject, exception);
                             throw exception;
                         });
                     } else {
                         throw exception;
                     }
-                }).thenCatch(function(e) {
+                }).thenCatch(function (e) {
                     e._nemoScreenshotHandled = true;
                     throw e;
                 });

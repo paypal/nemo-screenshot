@@ -24,7 +24,7 @@ plugins: {
   /* other plugins */
 },
 driver: {
-  //driver props
+  // driver props
 }
 ```
 
@@ -44,7 +44,9 @@ The plugin takes as argument the path to save the screenshots and an optional `e
 {
   "imageName": "myImage.png",
   "imagePath": "/path/to/image/"
-  [, "imageUrl": "jenkinsURL"] //this will be included optionally if Jenkins environment variables are present
+  // this will be included optionally if Jenkins environment variables are present
+  // "imageUrl": "jenkinsURL",
+  // "archivedImageUrl": "jenkinsURL"
 }
 ```
 
@@ -61,10 +63,10 @@ Usage example:
 ```javascript
   it('will do some stuff then take a screenshot', function (done) {
     nemo.somePlugin.someAction().then(function() {
-      //success!
+      // success!
       nemo.screenshot.done('success', done);
     }, function (err) {
-      //failure!
+      // failure!
       nemo.screenshot.done('success', done, err);
     });
   });
