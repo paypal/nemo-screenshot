@@ -81,6 +81,17 @@ function formatJenkinsImageUrls(screenShotPath, imageName) {
     }
 }
 
+/**
+ * Error thrown in uncaught exception handler is silenced for selenium-webdirver-2.52 onwards.
+ * The workaround is to throw error asynchronously.
+ * Ref: https://github.com/SeleniumHQ/selenium/issues/2770
+ */
+function asyncThrow(err) {
+    setTimeout(function () {
+        throw err;
+    }, 0);
+}
+
 module.exports = {
     /**
      *  setup - initialize this functionality during nemo.setup
@@ -198,8 +209,9 @@ module.exports = {
         if (autoCaptureOptions.indexOf('exception') !== -1) {
             flow.on(uncaughtException, function (exception) {
                 if (exception._nemoScreenshotHandled) {
-                    throw exception;
+                    asyncThrow(exception);
                 }
+
                 exception._nemoScreenshotHandled = true;
                 driver.getSession().then(function (session) {
                     if (session) {
@@ -219,7 +231,7 @@ module.exports = {
                     }
                 }).thenCatch(function (e) {
                     e._nemoScreenshotHandled = true;
-                    throw e;
+                    asyncThrow(e);
                 });
             });
         }
