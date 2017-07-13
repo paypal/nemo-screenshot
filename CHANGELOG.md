@@ -1,5 +1,9 @@
 # nemo-screenshot changelog
 
+## v2.2.2
+
+* fix silenced uncaught exception due to selenium-webdriver bug. See https://github.com/paypal/nemo-screenshot/pull/54
+
 ## v2.2.1
 
 * fix screenshot creation logic. See https://github.com/paypal/nemo-screenshot/pull/52
