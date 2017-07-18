@@ -1,5 +1,9 @@
 # nemo-screenshot changelog
 
+## v2.2.3
+
+* added a check in click event listener to prevent exception when driver.getSession() returns undefined value. See https://github.com/paypal/nemo-screenshot/pull/57
+
 ## v2.2.2
 
 * fix silenced uncaught exception due to selenium-webdriver bug. See https://github.com/paypal/nemo-screenshot/pull/54
