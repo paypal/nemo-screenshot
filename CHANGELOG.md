@@ -1,7 +1,10 @@
 # nemo-screenshot changelog
 
-## v2.2.4 
+## v3.0.0-alpha
 
+* add peerDependency for nemo >=2
+
+## v2.2.4 
 * simpler implementation of click screenshot that monkey patches WebElement.click
 
 ## v2.2.3
