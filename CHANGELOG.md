@@ -1,5 +1,9 @@
 # nemo-screenshot changelog
 
+## v3.0.0-alpha
+
+* add peerDependency for nemo >=2
+
 ## v2.2.3
 
 * added a check in click event listener to prevent exception when driver.getSession() returns undefined value. See https://github.com/paypal/nemo-screenshot/pull/57
