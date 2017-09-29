@@ -195,7 +195,7 @@ module.exports = {
         // Adding event listeners to take automatic screenshot
         if (autoCaptureOptions.indexOf('click') !== -1) {
             flow.on(scheduleTask, function (task) {
-                driver.getSession().then(function (session) {
+                driver.getSession() && driver.getSession().then(function (session) {
                     if (session && task !== undefined && task.indexOf('WebElement.click') !== -1) {
                         var filename = 'ScreenShot_onClick-' + process.pid + '-' + new Date().getTime();
                         flow.wait(function () {
