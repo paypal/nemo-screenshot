@@ -199,7 +199,7 @@ module.exports = {
                 var filename = 'ScreenShot_onClick-' + process.pid + '-' + new Date().getTime();
                 return nemo.screenshot.snap(filename)
                     .then(oclick.bind(this));
-            }
+            };
         }
 
         if (autoCaptureOptions.indexOf('exception') !== -1) {
