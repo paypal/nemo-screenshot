@@ -196,7 +196,6 @@ module.exports = {
         if (autoCaptureOptions.indexOf('click') !== -1) {
             var oclick = nemo.wd.WebElement.prototype.click;
             nemo.wd.WebElement.prototype.click = function () {
-                var p = nemo.wd.promise.defer();
                 var filename = 'ScreenShot_onClick-' + process.pid + '-' + new Date().getTime();
                 return nemo.screenshot.snap(filename)
                     .then(oclick.bind(this));
