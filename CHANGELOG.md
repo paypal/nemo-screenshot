@@ -1,6 +1,6 @@
 # nemo-screenshot changelog
 
-## unreleased
+## v2.2.4 
 
 * simpler implementation of click screenshot that monkey patches WebElement.click
 
