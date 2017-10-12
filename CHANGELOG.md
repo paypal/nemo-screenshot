@@ -1,5 +1,9 @@
 # nemo-screenshot changelog
 
+## unreleased
+
+* simpler implementation of click screenshot that monkey patches WebElement.click
+
 ## v2.2.3
 
 * added a check in click event listener to prevent exception when driver.getSession() returns undefined value. See https://github.com/paypal/nemo-screenshot/pull/57
