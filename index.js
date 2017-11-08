@@ -137,7 +137,10 @@ module.exports = {
             'snap': function (filename) {
                 var deferred = nemo.wd.promise.defer(),
                     imageObj = {},
-                    imageName;
+                    imageName,
+                    sourceName;
+
+
 
                 driver.takeScreenshot().then(function (screenImg) {
                     imageName = filename + '.png';
@@ -174,10 +177,44 @@ module.exports = {
                     deferred.reject(err);
                 });
 
+                driver.getPageSource().then(function (src) {
+                    sourceName = filename + '.html';
+
+                    var sourceDir = path.resolve(screenShotPath);
+                    var sourceFullPath = path.join(sourceDir, sourceName);
+
+                    // create directories all the way nested down to the last level
+                    mkdirp.sync(path.dirname(sourceFullPath));
+
+                    sourceObj.sourceName = sourceName;
+                    sourceObj.sourcePath = sourceFullPath;
+
+                    // Jenkins stuff
+                    if (process.env.JENKINS_URL) {
+                        var sourceUrls = formatJenkinsImageUrls(screenShotPath, sourceName);
+                        if (sourceUrls) {
+                            sourceObj.sourceUrl = sourceUrls.sourceUrl;
+                            sourceObj.archivedSourceUrl = sourceUrls.archivedSourceUrl;
+                        }
+                    }
+
+                    // save source file
+                    fs.writeFile(sourceFullPath, src, {
+                        'encoding': 'base64'
+                    }, function (err) {
+                        if (err) {
+                            deferred.reject(err);
+                        } else {
+                            deferred.fulfill(src);
+                        }
+                    });
+                }, function (err) {
+                    deferred.reject(err);
+                });
+
                 return deferred;
             },
-
-            'done': function (filename, done, err) {
+                'done': function (filename, done, err) {
                 this.snap(filename).then(function (imageObject) {
                     appendImageUrlToStackTrace(imageObject, err);
                     done(err);
