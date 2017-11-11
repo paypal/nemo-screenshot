@@ -177,6 +177,48 @@ module.exports = {
                 return deferred;
             },
 
+            /**
+             *  source - save a page source file as html to the 'report' directory
+             *  @param filename {String} - should be unique within the report directory and indicate which
+             *                             test it is associated with
+             *  @returns {Promise} - upon successful completion, Promise will resolve to a JSON object as below.
+             *                       {
+             *                           'sourceName': 'mySource.png',
+             *                           'sourcePath': '/path/to/source/'
+             *                       }
+             */
+            'source': function (filename) {
+                var deferred = nemo.wd.promise.defer(),
+                    sourceObj = {},
+                    sourceName;
+
+                driver.getPageSource().then(function (src) {
+                    sourceName = filename + '.html';
+
+                    var sourceDir = path.resolve(screenShotPath);
+                    var sourceFullPath = path.join(sourceDir, sourceName);
+
+                    // create directories all the way nested down to the last level
+                    mkdirp.sync(path.dirname(sourceFullPath));
+
+                    sourceObj.sourceName = sourceName;
+                    sourceObj.sourcePath = sourceFullPath;
+
+                    // save source file
+                    fs.writeFile(sourceFullPath, src, function (err) {
+                        if (err) {
+                            deferred.reject(err);
+                        } else {
+                            deferred.fulfill(sourceObj);
+                        }
+                    });
+                }, function (err) {
+                    deferred.reject(err);
+                });
+
+                return deferred;
+            },
+
             'done': function (filename, done, err) {
                 this.snap(filename).then(function (imageObject) {
                     appendImageUrlToStackTrace(imageObject, err);
@@ -199,6 +241,9 @@ module.exports = {
                     if (session && task !== undefined && task.indexOf('WebElement.click') !== -1) {
                         var filename = 'ScreenShot_onClick-' + process.pid + '-' + new Date().getTime();
                         flow.wait(function () {
+                            if (autoCaptureOptions.indexOf('source') !== -1) {
+                                nemo.screenshot.source(filename);
+                            }
                             return nemo.screenshot.snap(filename);
                         }, 10000);
                     }
@@ -221,11 +266,14 @@ module.exports = {
                         if (testTitle) {
                             filename = titleSlug(testTitle);
                         }
-
+                        if (autoCaptureOptions.indexOf('source') !== -1) {
+                            nemo.screenshot.source(filename);
+                        }
                         nemo.screenshot.snap(filename).then(function (imageObject) {
                             appendImageUrlToStackTrace(imageObject, exception);
                             throw exception;
                         });
+
                     } else {
                         throw exception;
                     }
