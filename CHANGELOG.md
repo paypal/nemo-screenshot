@@ -1,5 +1,9 @@
 # nemo-screenshot changelog
 
+## UNRELEASED
+
+* modify exception handler pattern to use the ControlFlow `emit` method. fix unit test for the same
+
 ## v2.2.5
 
 * resolve newer webdriver promise syntax and conditionally use native promises if available. fixes #61 
