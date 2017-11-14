@@ -1,5 +1,10 @@
 # nemo-screenshot changelog
 
+## UNRELEASED
+
+* resolve newer webdriver promise syntax and conditionally use native promises if available. fixes #61 
+* no-op "snap" if no valid session. fixes #60
+
 ## v2.2.4 
 
 * simpler implementation of click screenshot that monkey patches WebElement.click
