@@ -17,6 +17,23 @@ var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');
 
+//native promise vs webdriver promise shim
+function p(wd) {
+    var promiz;
+    var wdPromiz = wd.promise.defer();
+    var fulfill = function (n) {
+        wdPromiz.fulfill(n);
+    };
+    var reject = function (err) {
+        wdPromiz.reject(err);
+    };
+    promiz = (global.Promise) ? new Promise(function (good, bad) {
+        fulfill = good;
+        reject = bad;
+    }) : wdPromiz.promise;
+    return {promise: promiz, fulfill, reject};
+}
+
 function titleSlug(title) {
     if (!title) {
         return '';
@@ -117,6 +134,7 @@ module.exports = {
         }
 
         driver = nemo.driver;
+
         scheduleTask = nemo.wd.promise.ControlFlow.EventType.SCHEDULE_TASK;
         uncaughtException = nemo.wd.promise.ControlFlow.EventType.UNCAUGHT_EXCEPTION;
         flow = nemo.driver.controlFlow();
@@ -135,10 +153,14 @@ module.exports = {
              *                       }
              */
             'snap': function (filename) {
-                var deferred = nemo.wd.promise.defer(),
+                var deferred = p(nemo.wd),
                     imageObj = {},
                     imageName;
-
+                if (!driver.getSession()) {
+                    //no valid session. no-op.
+                    deferred.fulfill(true);
+                    return deferred.promise;
+                }
                 driver.takeScreenshot().then(function (screenImg) {
                     imageName = filename + '.png';
 
@@ -174,7 +196,7 @@ module.exports = {
                     deferred.reject(err);
                 });
 
-                return deferred;
+                return deferred.promise;
             },
 
             'done': function (filename, done, err) {
@@ -198,7 +220,7 @@ module.exports = {
             nemo.wd.WebElement.prototype.click = function () {
                 var filename = 'ScreenShot_onClick-' + process.pid + '-' + new Date().getTime();
                 return nemo.screenshot.snap(filename)
-                    .then(oclick.bind(this));
+                    .then(oclick.apply(this, arguments));
             };
         }
 
