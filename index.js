@@ -227,7 +227,7 @@ module.exports = {
         if (autoCaptureOptions.indexOf('exception') !== -1) {
             flow.on(uncaughtException, function (exception) {
                 if (exception._nemoScreenshotHandled) {
-                    asyncThrow(exception);
+                    flow.emit(uncaughtException, exception);
                 }
 
                 exception._nemoScreenshotHandled = true;
@@ -242,14 +242,14 @@ module.exports = {
 
                         nemo.screenshot.snap(filename).then(function (imageObject) {
                             appendImageUrlToStackTrace(imageObject, exception);
-                            throw exception;
+                            flow.emit(uncaughtException, exception);
                         });
                     } else {
                         throw exception;
                     }
-                }).thenCatch(function (e) {
+                }).catch(function (e) {
                     e._nemoScreenshotHandled = true;
-                    asyncThrow(e);
+                    flow.emit(uncaughtException, exception);
                 });
             });
         }
