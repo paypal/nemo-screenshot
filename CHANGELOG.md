@@ -1,5 +1,10 @@
 # nemo-screenshot changelog
 
+## UNRELEASED
+
+* resolve newer webdriver promise syntax and conditionally use native promises if available. fixes #61 
+* no-op "snap" if no valid session. fixes #60
+
 ## v3.0.0-alpha
 
 * add peerDependency for nemo >=2

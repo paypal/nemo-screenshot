@@ -14,7 +14,7 @@
     "grunt-contrib-jshint": "^1.0.0",
     "grunt-simple-mocha": "^0.4.1",
     "mocha": "^2.4.5",
-    "nemo": "^2.1.1",
+    "nemo": "^3",
     "phantomjs": "^2.1.7",
     "rimraf": "^2.5.2"
   },
