@@ -44,22 +44,7 @@ describe('nemo-screenshot', function () {
 
 
     });
-    //afterEach(function (done) {
-    //    nemo.driver.getSession().then(function (session) {
-    //        if (!session) {
-    //            nemo.driver.quit().then(function () {
-    //                done();
-    //            }, function () {
-    //                done();
-    //            });
-    //        } else {
-    //            done();
-    //        }
-    //
-    //    })
-    //
-    //
-    //});
+
 
     it('will get @setup@', function (done) {
         assert(nemo.screenshot);
@@ -80,19 +65,17 @@ describe('nemo-screenshot', function () {
             done();
         });
     });
-    // not sure how to test this as an uncaughtException ALWAYS fails a mocha test
-    // it('will take a screenshot for an uncaughtException event', function (done) {
-    //     nemo.driver.get('http://www.google.com');
-    //     nemo.driver.findElement(nemo.wd.By.name('sfsfq')).sendKeys('foobar');
-    //     nemo.driver.sleep(1).then(function () {
-    //         console.log('foo')
-    //     }, function (err) {
-    //         done();
-    //     }).thenCatch(function (err) {
-    //         done();
-    //     });
-    // });
 
+    it('will take a screenshot for an uncaughtException event', function (done) {
+        function unExList(ex) {
+            console.log(ex);
+            nemo.driver.controlFlow().removeListener('uncaughtException', unExList);
+            done();
+        }
+        nemo.driver.get('http://www.google.com');
+        nemo.driver.findElement(nemo.wd.By.name('sfsfq')).sendKeys('foobar');
+        nemo.driver.controlFlow().on('uncaughtException', unExList);
+    });
     it('will use @done@error@ to take a screenshot in an error scenario', function (done) {
         nemo.screenshot.done('goog', function fakeDone(err) {
             assert(err.stack.indexOf('nemo-screenshot') !== -1);
@@ -100,5 +83,6 @@ describe('nemo-screenshot', function () {
             done();
         }, new Error('my error'));
     });
+
 
 });
