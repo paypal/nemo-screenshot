@@ -1,6 +1,6 @@
 # nemo-screenshot changelog
 
-## UNRELEASED
+## v2.2.5
 
 * resolve newer webdriver promise syntax and conditionally use native promises if available. fixes #61 
 * no-op "snap" if no valid session. fixes #60
