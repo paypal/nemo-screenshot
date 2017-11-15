@@ -41,9 +41,8 @@ describe('nemo-screenshot-quit-driver-for-each-iteration', function () {
 
 
     });
-    afterEach(function (done) {
-        nemo.driver.quit().then(done);
-
+    afterEach(function () {
+        return nemo.driver.quit();
     });
 
 
