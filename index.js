@@ -98,16 +98,6 @@ function formatJenkinsImageUrls(screenShotPath, imageName) {
     }
 }
 
-/**
- * Error thrown in uncaught exception handler is silenced for selenium-webdirver-2.52 onwards.
- * The workaround is to throw error asynchronously.
- * Ref: https://github.com/SeleniumHQ/selenium/issues/2770
- */
-function asyncThrow(err) {
-    setTimeout(function () {
-        throw err;
-    }, 0);
-}
 
 module.exports = {
     /**
@@ -227,7 +217,7 @@ module.exports = {
         if (autoCaptureOptions.indexOf('exception') !== -1) {
             flow.on(uncaughtException, function (exception) {
                 if (exception._nemoScreenshotHandled) {
-                    asyncThrow(exception);
+                    flow.emit(uncaughtException, exception);
                 }
 
                 exception._nemoScreenshotHandled = true;
@@ -242,14 +232,14 @@ module.exports = {
 
                         nemo.screenshot.snap(filename).then(function (imageObject) {
                             appendImageUrlToStackTrace(imageObject, exception);
-                            throw exception;
+                            flow.emit(uncaughtException, exception);
                         });
                     } else {
                         throw exception;
                     }
-                }).thenCatch(function (e) {
+                }).catch(function (e) {
                     e._nemoScreenshotHandled = true;
-                    asyncThrow(e);
+                    flow.emit(uncaughtException, exception);
                 });
             });
         }
