@@ -98,16 +98,6 @@ function formatJenkinsImageUrls(screenShotPath, imageName) {
     }
 }
 
-/**
- * Error thrown in uncaught exception handler is silenced for selenium-webdirver-2.52 onwards.
- * The workaround is to throw error asynchronously.
- * Ref: https://github.com/SeleniumHQ/selenium/issues/2770
- */
-function asyncThrow(err) {
-    setTimeout(function () {
-        throw err;
-    }, 0);
-}
 
 module.exports = {
     /**
