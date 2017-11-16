@@ -1,6 +1,6 @@
 # nemo-screenshot changelog
 
-## UNRELEASED
+## v3.0.2
 
 * modify exception handler pattern to use the ControlFlow `emit` method. fix unit test for the same
 

@@ -19,31 +19,28 @@ var config = {
         browser: 'phantomjs'
     }
 };
-var cleaner = function (cb) {
+var cleaner = function () {
+    let pFunk;
+    let p = new Promise((resolve, reject) => {
+        pFunk = {resolve, reject};
+    });
     rm(path.resolve(__dirname, 'report'), {}, function (err) {
         if (err) {
-            return cb(err);
+            return pFunk.reject(err);
         }
-        cb();
-    })
+        pFunk.resolve(true)
+    });
+    return p;
 };
 describe('nemo-screenshot', function () {
-    before(function (done) {
-        cleaner(function (err) {
-            if (err) {
-                return done(err);
-            }
-            nemo = Nemo(basedir, config, function (err) {
-                if (err) {
-                    done(err);
-                } else {
-                    done();
-                }
-            });
-        })
-
-
-    });
+    before(function () {
+        return cleaner().then(() => {
+            return Nemo(basedir, config)
+        }).then((n) => {
+            nemo = n;
+            return true;
+        });
+    })
 
 
     it('will get @setup@', function (done) {
@@ -72,6 +69,7 @@ describe('nemo-screenshot', function () {
             nemo.driver.controlFlow().removeListener('uncaughtException', unExList);
             done();
         }
+
         nemo.driver.get('http://www.google.com');
         nemo.driver.findElement(nemo.wd.By.name('sfsfq')).sendKeys('foobar');
         nemo.driver.controlFlow().on('uncaughtException', unExList);
@@ -85,4 +83,5 @@ describe('nemo-screenshot', function () {
     });
 
 
-});
+})
+;
