@@ -22,11 +22,11 @@ var config = {
 var cleaner = function () {
     let pFunk;
     let p = new Promise((resolve, reject) => {
-        pFunk = {resolve, reject}
-    })
+        pFunk = {resolve, reject};
+    });
     rm(path.resolve(__dirname, 'report'), {}, function (err) {
         if (err) {
-            return pFunk.reject(err)
+            return pFunk.reject(err);
         }
         pFunk.resolve(true)
     });
