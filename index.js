@@ -189,6 +189,52 @@ module.exports = {
                 return deferred.promise;
             },
 
+            /**
+             *  source - save a page source file as html to the 'report' directory
+             *  @param filename {String} - should be unique within the report directory and indicate which
+             *                             test it is associated with
+             *  @returns {Promise} - upon successful completion, Promise will resolve to a JSON object as below.
+             *                       {
+             *                           'sourceName': 'mySource.html',
+             *                           'sourcePath': '/path/to/source/'
+             *                       }
+             */
+            'source': function (filename) {
+                var deferred = p(nemo.wd),
+                    sourceObj = {},
+                    sourceName;
+                if (!driver.getSession()) {
+                    //no valid session. no-op.
+                    deferred.fulfill(true);
+                    return deferred.promise;
+                }
+                driver.getPageSource().then(function (src) {
+                    sourceName = filename + '.html';
+
+                    var sourceDir = path.resolve(screenShotPath);
+                    var sourceFullPath = path.join(sourceDir, sourceName);
+
+                    // create directories all the way nested down to the last level
+                    mkdirp.sync(path.dirname(sourceFullPath));
+
+                    sourceObj.sourceName = sourceName;
+                    sourceObj.sourcePath = sourceFullPath;
+
+                    // save source file
+                    fs.writeFile(sourceFullPath, src, function (err) {
+                        if (err) {
+                            deferred.reject(err);
+                        } else {
+                            deferred.fulfill(sourceObj);
+                        }
+                    });
+                }, function (err) {
+                    deferred.reject(err);
+                });
+
+                return deferred.promise;
+            },
+
             'done': function (filename, done, err) {
                 this.snap(filename).then(function (imageObject) {
                     appendImageUrlToStackTrace(imageObject, err);
@@ -209,6 +255,10 @@ module.exports = {
             var oclick = nemo.wd.WebElement.prototype.click;
             nemo.wd.WebElement.prototype.click = function () {
                 var filename = 'ScreenShot_onClick-' + process.pid + '-' + new Date().getTime();
+
+                if (autoCaptureOptions.indexOf('source') !== -1) {
+                    nemo.screenshot.source(filename);
+                }
                 return nemo.screenshot.snap(filename)
                     .then(oclick.apply(this, arguments));
             };
@@ -228,6 +278,10 @@ module.exports = {
 
                         if (testTitle) {
                             filename = titleSlug(testTitle);
+                        }
+
+                        if (autoCaptureOptions.indexOf('source') !== -1) {
+                            nemo.screenshot.source(filename);
                         }
 
                         nemo.screenshot.snap(filename).then(function (imageObject) {

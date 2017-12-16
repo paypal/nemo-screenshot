@@ -63,6 +63,24 @@ describe('nemo-screenshot', function () {
         });
     });
 
+
+    it('will use @done@error@ to take a screenshot in an error scenario', function (done) {
+        nemo.screenshot.done('goog', function fakeDone(err) {
+            assert(err.stack.indexOf('nemo-screenshot') !== -1);
+            assert(fs.statSync(path.resolve(__dirname, 'report/goog.png')));
+            done();
+        }, new Error('my error'));
+    });
+    it('will use @source@ to take a page source file', function (done) {
+        nemo.driver.get('http://www.google.com');
+        nemo.screenshot.source('goog').then(function () {
+            //verify file exists
+            assert(fs.statSync(path.resolve(__dirname, 'report/goog.html')));
+            done();
+        });
+
+    });
+
     it('will take a screenshot for an uncaughtException event', function (done) {
         function unExList(ex) {
             console.log(ex);
@@ -73,13 +91,6 @@ describe('nemo-screenshot', function () {
         nemo.driver.get('http://www.google.com');
         nemo.driver.findElement(nemo.wd.By.name('sfsfq')).sendKeys('foobar');
         nemo.driver.controlFlow().on('uncaughtException', unExList);
-    });
-    it('will use @done@error@ to take a screenshot in an error scenario', function (done) {
-        nemo.screenshot.done('goog', function fakeDone(err) {
-            assert(err.stack.indexOf('nemo-screenshot') !== -1);
-            assert(fs.statSync(path.resolve(__dirname, 'report/goog.png')));
-            done();
-        }, new Error('my error'));
     });
 
 

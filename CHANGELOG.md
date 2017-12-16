@@ -1,5 +1,10 @@
 # nemo-screenshot changelog
 
+## UNRELEASED
+* implement the function to take html page source. 
+* Add argument "source" to plugin config. Then page source html files will be created when screenshots get been taken.
+* page source will be saved as html files in screenshots folder. 
+
 ## v3.0.2
 
 * modify exception handler pattern to use the ControlFlow `emit` method. fix unit test for the same
