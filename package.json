@@ -8,13 +8,13 @@
     "test": "grunt"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
+    "chai": "^4.2.0",
     "glob": "^7.0.3",
     "grunt": "^1.0.1",
-    "grunt-contrib-jshint": "^1.0.0",
+    "grunt-contrib-jshint": "^2.1.0",
     "grunt-simple-mocha": "^0.4.1",
-    "mocha": "^2.4.5",
-    "nemo": "^2.1.1",
+    "mocha": "^6.1.4",
+    "nemo": "^4.9.6",
     "phantomjs": "^2.1.7",
     "rimraf": "^2.5.2"
   },
