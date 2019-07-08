@@ -4,7 +4,7 @@ Nemo plugin which uses selenium-webdriver to take a screenshot
 
 Register as "screenshot" (see below)
 
-[![Build Status](https://travis-ci.org/paypal/nemo-screenshot.svg?branch=master)](https://travis-ci.org/paypal/nemo-screenshot)
+[![Build Status](https://travis-ci.org/paypal/nemo-screenshot.svg?branch=master)](https://travis-ci.org/paypal/nemo-screenshot) [![Greenkeeper badge](https://badges.greenkeeper.io/paypal/nemo-screenshot.svg)](https://greenkeeper.io/)
 
 ### Requirements
 
